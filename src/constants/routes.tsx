@@ -1,4 +1,4 @@
-import { lazy } from 'react'
+import { lazy, Suspense } from 'react'
 import type { RouteObject } from 'react-router-dom'
 
 const RootPage = lazy(() => import('@/pages/Root/RootPage'))
@@ -8,11 +8,11 @@ const DrawPage = lazy(() => import('@/pages/Draw/DrawPage'))
 const ROUTES: Record<string, RouteObject> = {
   root: {
     path: '/',
-    element: <RootPage />,
+    element: <Suspense><RootPage /></Suspense>,
     children: [
       {
         path: 'draw/:drawId',
-        element: <DrawPage />
+        element: <Suspense><DrawPage /></Suspense>
       }
     ],
   }
