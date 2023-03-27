@@ -23,8 +23,10 @@
       "@/pages/*": ["src/pages/*"],
       "@/dtos/*": ["src/dtos/*"],
       "@/hooks/*": ["src/hooks/*"],
-    }
+      "@/test-utils/*": ["test-utils/*"],
+    },
+    "types": ["vitest/globals"]
   },
-  "include": ["src"],
+  "include": ["src", "vitest.setup.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
