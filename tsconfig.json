@@ -23,6 +23,8 @@
       "@/pages/*": ["src/pages/*"],
       "@/dtos/*": ["src/dtos/*"],
       "@/hooks/*": ["src/hooks/*"],
+      "@/store/*": ["src/store/*"],
+      "@/modals/*": ["src/modals/*"],
       "@/test-utils/*": ["test-utils/*"],
     },
     "types": ["vitest/globals"]

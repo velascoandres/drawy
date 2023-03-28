@@ -16,6 +16,8 @@ export default defineConfig({
       '@/dtos': path.resolve(__dirname, './src/dtos/'),
       '@/types': path.resolve(__dirname, './src/types/'),
       '@/hooks': path.resolve(__dirname, './src/hooks/'),
+      '@/store': path.resolve(__dirname, './src/store/'),
+      '@/modals': path.resolve(__dirname, './src/modals/'),
       '@/test-utils': path.resolve(__dirname, './test-utils/'),
     }
   },
