@@ -7,7 +7,7 @@ import {
 
 import { ChakraProvider } from '@chakra-ui/react'
 
-import ModalContainer from '@/components/ModalContainer/ModalCointainer'
+import ModalContainer from '@/components/ModalContainer/ModalContainer'
 import ROUTES from '@/constants/routes'
 
 const router = createBrowserRouter(ROUTES)

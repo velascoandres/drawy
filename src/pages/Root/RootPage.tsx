@@ -48,7 +48,7 @@ const RootPage = () => {
       component: CreateDrawModal,
       config: {
         closeOnClickOutside: false,
-        closeOnEscapeKeydown: false,
+        closeOnEscapeKeydown: true,
       }
     })
   }

@@ -24,36 +24,14 @@ const ModalContainer = () => {
     return <ModalComponent {...componentProps } />
   }
 
-  React.useEffect(() => {
-    const hasCloseOnEscapeKeydown = currentModal?.config?.closeOnEscapeKeydown
-
-    const handleKeydown = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') {
-        return 
-      }
-      
-      if (!hasCloseOnEscapeKeydown) {
-        return
-      }
-
-      closeModal()
-    }
-
-    document.addEventListener('keydown', handleKeydown)
-
-    return () => {
-      document.removeEventListener('keydown', handleKeydown)
-    }
-
-  }, [closeModal, currentModal])
-
   return (
     <Modal 
       isOpen={isOpen} 
-      onClose={closeModal} 
+      onClose={closeModal}
+      closeOnEsc={currentModal?.config?.closeOnEscapeKeydown}
       closeOnOverlayClick={currentModal?.config?.closeOnClickOutside}
     >
-      <ModalOverlay />
+      <ModalOverlay aria-label="overlay" />
       {renderModal()}
     </Modal>
   )

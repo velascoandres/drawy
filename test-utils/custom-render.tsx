@@ -1,5 +1,6 @@
 import { afterEach } from 'vitest'
 
+import { ChakraProvider } from '@chakra-ui/react'
 import { cleanup, render } from '@testing-library/react'
 
 afterEach(() => {
@@ -9,7 +10,7 @@ afterEach(() => {
 const customRender = (ui: React.ReactElement, options = {}) =>
   render(ui, {
     // wrap provider(s) here if needed
-    wrapper: ({ children }) => children,
+    wrapper: ({ children }) => <ChakraProvider>{children}</ChakraProvider>,
     ...options,
   })
 

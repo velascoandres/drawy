@@ -47,10 +47,10 @@ const useModalStore = create<IModalState>()(devtools((setStore) => ({
     })
   },
   closeModal: () => {
-    setStore((state) => {
+    setStore(() => {
        
       return {
-        ...state,
+        currentModal: undefined,
         isOpen: false,
       }
     })

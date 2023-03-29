@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
+import CreateDrawModal from '@/modals/CreateDraw/CreateDrawModal'
+import useModalStore from '@/store/modal/modalStore'
 import { customRender, fireEvent } from '@/test-utils/custom-render'
 
 import RootPage from './RootPage'
@@ -40,6 +42,18 @@ describe('<DrawList /> tests', () => {
       fireEvent.click(getByText('draw 1'))
 
       expect(navigateMock).toHaveBeenCalledWith('/draw/1')
+    })
+  })
+
+  describe('When click on Add draw', () => {
+    it('should open the modal', () => {
+      const { getByText } = customRender(<RootPage />)
+
+
+      fireEvent.click(getByText('Add draw'))
+
+      expect(useModalStore.getState().isOpen).toBeTruthy()
+      expect(useModalStore.getState().currentModal?.component).toStrictEqual(CreateDrawModal)
     })
   })
 })
