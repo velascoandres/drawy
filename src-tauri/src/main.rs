@@ -16,6 +16,9 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             create_draw_command, 
             find_one_draw_command,
+            find_all_draws_command,
+            delete_draw_command,
+            update_draw_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

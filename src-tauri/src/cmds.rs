@@ -1,12 +1,12 @@
 use diesel::result::Error;
 use serde::Serialize;
 
-use crate::{draws, state::AppState, models::Draw};
+use crate::{draws, state::AppState};
 
 #[derive(Serialize)]
-pub struct Response {
+struct Response<T> {
     error: Option<String>,
-    data: Option<Draw>
+    data: Option<T>
 }
 
 #[tauri::command]
@@ -23,10 +23,40 @@ pub fn find_one_draw_command(draw_id: String,state: tauri::State<AppState>) -> S
     let result = draws::find_one_draw(conn, draw_id);
 
     let response = match result {
-        Ok(created) => Response { data: created, error: None },
+        Ok(draw) => Response { data: draw, error: None },
         Err(Error::DatabaseError(e, _)) => Response { data: None, error: Some(format!("Database error: {:?}", e)) },
         _ => Response { data: None, error: Some("An error has occured".to_string()) },
     };
 
     serde_json::to_string(&response).unwrap()
+}
+
+#[tauri::command]
+pub fn find_all_draws_command(state: tauri::State<AppState>) -> String {
+    let conn =&mut *state.conn.lock().unwrap();
+    let result = draws::find_all_draws(conn);
+
+    let response = match result {
+        Ok(draws) => Response {data: Some(draws), error: None },
+        Err(Error::DatabaseError(e, _)) => Response { data: None, error: Some(format!("Database error: {:?}", e)) },
+        _ => Response { data: None, error: Some("An error has occured".to_string()) },
+    };
+
+    serde_json::to_string(&response).unwrap()
+}
+
+#[tauri::command]
+pub fn update_draw_command(draw_id: String, new_name: String, new_raw_elements: String, state: tauri::State<AppState>) -> bool {
+    let conn = &mut *state.conn.lock().unwrap();
+    let result = draws::update_draw(conn, draw_id, new_name, new_raw_elements);
+
+    result.is_ok()
+}
+
+#[tauri::command]
+pub fn delete_draw_command(draw_id: String, state: tauri::State<AppState>) -> bool {
+    let conn = &mut *state.conn.lock().unwrap();
+    let result = draws::delete_draw(conn, draw_id);
+
+    result.is_ok()
 }
