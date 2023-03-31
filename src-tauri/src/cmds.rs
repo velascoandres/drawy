@@ -10,11 +10,17 @@ struct Response<T> {
 }
 
 #[tauri::command]
-pub fn create_draw_command(name: String, element_meta: String, state: tauri::State<AppState>) -> bool {
+pub fn create_draw_command(name: String, elements_meta: String, state: tauri::State<AppState>) -> String {
     let conn =&mut *state.conn.lock().unwrap();
-    let result = draws::create_draw(conn, name, element_meta);
+    let result = draws::create_draw(conn, name, elements_meta);
 
-    result.is_ok()
+    let response = match result {
+        Ok(created_id) => Response { data: Some(created_id), error: None },
+        Err(Error::DatabaseError(e, _)) => Response { data: None, error: Some(format!("Database error: {:?}", e)) },
+        _ => Response { data: None, error: Some("An error has occured".to_string()) },
+    };
+
+    serde_json::to_string(&response).unwrap()
 }
 
 #[tauri::command]
@@ -46,17 +52,29 @@ pub fn find_all_draws_command(state: tauri::State<AppState>) -> String {
 }
 
 #[tauri::command]
-pub fn update_draw_command(draw_id: String, new_name: String, new_raw_elements: String, state: tauri::State<AppState>) -> bool {
+pub fn update_draw_command(draw_id: String, name: String, elements_meta: String, state: tauri::State<AppState>) -> String {
     let conn = &mut *state.conn.lock().unwrap();
-    let result = draws::update_draw(conn, draw_id, new_name, new_raw_elements);
+    let result = draws::update_draw(conn, draw_id, name, elements_meta);
 
-    result.is_ok()
+    let response = match result {
+        Ok(_) => Response { data: Some(true), error: None },
+        Err(Error::DatabaseError(e, _)) => Response { data: None, error: Some(format!("Database error: {:?}", e)) },
+        _ => Response { data: None, error: Some("An error has occured".to_string()) },
+    };
+
+    serde_json::to_string(&response).unwrap()
 }
 
 #[tauri::command]
-pub fn delete_draw_command(draw_id: String, state: tauri::State<AppState>) -> bool {
+pub fn delete_draw_command(draw_id: String, state: tauri::State<AppState>) -> String {
     let conn = &mut *state.conn.lock().unwrap();
     let result = draws::delete_draw(conn, draw_id);
 
-    result.is_ok()
+    let response = match result {
+        Ok(_) => Response { data: Some(true), error: None },
+        Err(Error::DatabaseError(e, _)) => Response { data: None, error: Some(format!("Database error: {:?}", e)) },
+        _ => Response { data: None, error: Some("An error has occured".to_string()) },
+    };
+
+    serde_json::to_string(&response).unwrap()
 }

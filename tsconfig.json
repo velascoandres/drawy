@@ -20,6 +20,7 @@
       "@/components/*": ["src/components/*"],
       "@/constants/*": ["src/constants/*"],
       "@/services/*": ["src/services/*"],
+      "@/queries/*": ["src/queries/*"],
       "@/pages/*": ["src/pages/*"],
       "@/dtos/*": ["src/dtos/*"],
       "@/hooks/*": ["src/hooks/*"],

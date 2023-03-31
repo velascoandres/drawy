@@ -4,6 +4,7 @@ specifiers:
   '@chakra-ui/react': ^2.5.3
   '@emotion/react': ^11.10.6
   '@emotion/styled': ^11.10.6
+  '@tauri-apps/api': ^1.2.0
   '@testing-library/dom': ^9.2.0
   '@testing-library/jest-dom': ^5.16.5
   '@testing-library/react': ^14.0.0
@@ -35,6 +36,7 @@ dependencies:
   '@chakra-ui/react': 2.5.3_zs2yzs4w3t27iaxmz25ugwqizq
   '@emotion/react': 11.10.6_k4en7uapxoluuejoeg6o3ic2aa
   '@emotion/styled': 11.10.6_zor2bu4ftuliqy4oeppgoopsea
+  '@tauri-apps/api': 1.2.0
   framer-motion: 10.9.1_biqbaboplfbrettd7655fr4n2y
   install: 0.13.0
   react: 18.2.0
@@ -1726,6 +1728,11 @@ packages:
       '@swc/core-win32-ia32-msvc': 1.3.42
       '@swc/core-win32-x64-msvc': 1.3.42
     dev: true
+
+  /@tauri-apps/api/1.2.0:
+    resolution: {integrity: sha512-lsI54KI6HGf7VImuf/T9pnoejfgkNoXveP14pVV7XarrQ46rOejIVJLFqHI9sRReJMGdh2YuCoI3cc/yCWCsrw==}
+    engines: {node: '>= 14.6.0', npm: '>= 6.6.0', yarn: '>= 1.19.1'}
+    dev: false
 
   /@testing-library/dom/9.2.0:
     resolution: {integrity: sha512-xTEnpUKiV/bMyEsE5bT4oYA0x0Z/colMtxzUY8bKyPXBNLn/e0V4ZjBZkEhms0xE4pv9QsPfSRu9AWS4y5wGvA==}

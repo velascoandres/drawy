@@ -3,7 +3,7 @@ use diesel::prelude::*;
 use diesel::result::Error;
 use uuid::Uuid;
 
-pub fn create_draw(conn: &mut SqliteConnection, new_name: String, new_raw_elements: String) -> Result<usize, Error> {
+pub fn create_draw(conn: &mut SqliteConnection, new_name: String, new_raw_elements: String) -> Result<String, Error> {
     use crate::schema::draws::dsl::*;
 
     let uuid = Uuid::new_v4();
@@ -15,8 +15,9 @@ pub fn create_draw(conn: &mut SqliteConnection, new_name: String, new_raw_elemen
      };
 
      diesel::insert_into(draws)
-        .values(&new_draw)
-        .execute(conn)
+        .values(&new_draw).execute(conn)?;
+
+     Ok(uuid.to_string())
 }
 
 pub fn find_all_draws(conn: &mut SqliteConnection) -> Result<Vec<Draw>, Error> {
