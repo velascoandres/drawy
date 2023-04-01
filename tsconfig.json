@@ -21,6 +21,7 @@
       "@/constants/*": ["src/constants/*"],
       "@/services/*": ["src/services/*"],
       "@/queries/*": ["src/queries/*"],
+      "@/mutations/*": ["src/mutations/*"],
       "@/pages/*": ["src/pages/*"],
       "@/dtos/*": ["src/dtos/*"],
       "@/hooks/*": ["src/hooks/*"],

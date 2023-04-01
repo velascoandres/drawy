@@ -19,25 +19,16 @@ import {
 
 import DrawList, { IDrawListItem } from '@/components/DrawList/DrawList'
 import CreateDrawModal from '@/modals/CreateDraw/CreateDrawModal'
+import { useGetDrawsQuery } from '@/queries/drawQueries'
 import useModalStore from '@/store/modal/modalStore'
 
-const items: {id: string, name: string, path: string}[] = [
-  {
-    id: '1',
-    name: 'draw 1',
-    path: 'draw/1'
-  },
-  {
-    id: '2',
-    name: 'draw 2',
-    path: 'draw/2'
-  }
-]
 
 const RootPage = () => {
   const { isOpen, onClose, onOpen } = useDisclosure()
   const navigate = useNavigate()
   const { openModal } = useModalStore()
+
+  const { data: draws = [] } = useGetDrawsQuery()
 
   const navigateToDrawPage = (item: IDrawListItem) => {
     navigate(`/draw/${item.id}`)
@@ -71,7 +62,7 @@ const RootPage = () => {
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
       <Button onClick={openCreateDrawModal}>Add draw</Button>
-      <DrawList items={items} onSelectDraw={navigateToDrawPage} />
+      <DrawList items={draws} onSelectDraw={navigateToDrawPage} />
     </Box>
   )
 

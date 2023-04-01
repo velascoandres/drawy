@@ -14,6 +14,8 @@ export default defineConfig({
       '@/layouts': path.resolve(__dirname, './src/layouts/'),
       '@/constants': path.resolve(__dirname, './src/constants/'),
       '@/services': path.resolve(__dirname, './src/services/'),
+      '@/queries': path.resolve(__dirname, './src/queries/'),
+      '@/mutations': path.resolve(__dirname, './src/mutations/'),
       '@/dtos': path.resolve(__dirname, './src/dtos/'),
       '@/types': path.resolve(__dirname, './src/types/'),
       '@/hooks': path.resolve(__dirname, './src/hooks/'),
