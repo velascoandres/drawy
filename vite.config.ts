@@ -18,6 +18,7 @@ export default defineConfig({
       '@/store': path.resolve(__dirname, './src/store/'),
       '@/modals': path.resolve(__dirname, './src/modals/'),
       '@/queries': path.resolve(__dirname, './src/queries/'),
+      '@/mutations': path.resolve(__dirname, './src/mutations/'),
       '@/services': path.resolve(__dirname, './src/services/'),
       '@/test-utils': path.resolve(__dirname, './test-utils/'),
     }
