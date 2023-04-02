@@ -39,7 +39,7 @@ const CreateDrawModal = () => {
     <ModalContent>
       <form onSubmit={form.handleSubmit(onSubmit)}>
 
-        <ModalHeader>Modal Title</ModalHeader>
+        <ModalHeader>Create a new Draw</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <FormProvider {...form}>

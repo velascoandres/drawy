@@ -82,7 +82,12 @@ export const useDeleteDrawMutation = () => {
     
       const previousDraws = queryClient.getQueryData(['draws'])
     
-      
+      queryClient.setQueryData(['draws'], (old: IDraw[] | undefined) => {
+        const prev = old || []
+        const index = prev.findIndex(prevDraw => prevDraw.id === drawId)
+
+        return prev.splice(index, 1)
+      })
     
       return { previousDraws }
     },

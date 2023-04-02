@@ -1,6 +1,7 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, Mock, vi } from 'vitest'
 
 import CreateDrawModal from '@/modals/CreateDraw/CreateDrawModal'
+import { useGetDrawsQuery } from '@/queries/drawQueries'
 import useModalStore from '@/store/modal/modalStore'
 import { customRender, fireEvent } from '@/test-utils/custom-render'
 
@@ -8,10 +9,13 @@ import RootPage from './RootPage'
 
 const navigateMock = vi.fn()
 
+vi.mock('zustand')
 vi.mock('react-router-dom', () => ({
   Outlet: () => null,  
   useNavigate: () => navigateMock,
 }))
+
+vi.mock('@/queries/drawQueries')
 
 const items = [
   { id: '1', name: 'draw 1' }, 
@@ -19,9 +23,12 @@ const items = [
 ]
 
 
+const useGetDrawsQueryMock = useGetDrawsQuery as Mock
+
 describe('<DrawList /> tests', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    useGetDrawsQueryMock.mockReturnValue({ data: items })
   })
 
   describe('When renders', () => {

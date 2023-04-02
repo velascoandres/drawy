@@ -10,7 +10,8 @@ export interface IDrawListItemProps extends FlexProps {
 }
 const DrawListItem = ({ item, ...rest }: IDrawListItemProps) => {
   const { onSelectItem, selectedItem } = React.useContext(DrawListContext) as IDrawListContext
-  
+  const isSelected = selectedItem?.id === item.id
+
   return (
     <Flex
       align="center"
@@ -19,11 +20,11 @@ const DrawListItem = ({ item, ...rest }: IDrawListItemProps) => {
       borderRadius="lg"
       role="group"
       cursor="pointer"
-      bg={selectedItem?.id === item.id ? 'cyan.400' : 'white'}
+      bg={isSelected ? 'black' : 'white'}
+      color={isSelected ? 'white' : 'black'}
       onClick={() => onSelectItem(item)}
       _hover={{
-        bg: 'cyan.400',
-        color: 'white',
+        bg: isSelected ? 'black' : 'gray.200'
       }}
       {...rest}
     >
