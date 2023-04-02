@@ -33,7 +33,7 @@ const DrawList = (props: IDrawListProps) => {
         padding="2"
       >
         {items.map((draw) => (
-          <DrawListItem key={draw.name} item={draw} />
+          <DrawListItem key={draw.id} item={draw} />
         ))}
       </Box>
     </DrawListContext.Provider>

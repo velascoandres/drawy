@@ -15,26 +15,16 @@ export const useCreateDrawMutation = () => {
         throw new Error('Error on create a draw')
       }
 
-      return {
-        id: response.data,
-        ...draw
+      return response.data as string
+    },
+    onSuccess: async (newDrawId: string, drawPayload: Omit<IDraw, 'id'>) => {
+      const newDraw = {
+        id: newDrawId,
+        ...drawPayload
       }
-    },
-    onMutate: async (newDraw: IDraw) => {
-      await queryClient.cancelQueries({ queryKey: ['draws'] })
 
-      const previousDraws = queryClient.getQueryData(['draws'])
-
-      queryClient.setQueryData(['draws'], (old: IDraw[] | undefined) => [...old || [], newDraw])
-
-      return { previousDraws }
-    },
-    onError: (_err, _newDraw, context) => {
-      queryClient.setQueryData(['draws'], context?.previousDraws)
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['draws'] })
-    },
+      queryClient.setQueryData('draws', (old: IDraw[] | undefined) => [...old || [], newDraw])
+    }
   })
 }
 
@@ -92,12 +82,7 @@ export const useDeleteDrawMutation = () => {
     
       const previousDraws = queryClient.getQueryData(['draws'])
     
-      queryClient.setQueryData(['draws'], (old: IDraw[] | undefined) => {
-        const prev = old || []
-        const index = prev.findIndex(prevDraw => prevDraw.id === drawId)
-  
-        return prev.splice(index, 1)
-      })
+      
     
       return { previousDraws }
     },

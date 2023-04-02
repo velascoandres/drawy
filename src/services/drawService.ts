@@ -13,7 +13,7 @@ export interface IBackendResponse<T> {
 
 const createDraw = async (newDraw: Omit<IDraw, 'id'>): Promise<IBackendResponse<string>> => {
   const result = await invoke('create_draw_command', {
-    newName: newDraw,
+    name: newDraw.name,
     elementsMeta: JSON.stringify(newDraw.elements || [])
   })
 

@@ -1,8 +1,8 @@
+import React from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
+
 import { 
   Button, 
-  FormControl,
-  FormLabel, 
-  Input, 
   ModalBody, 
   ModalCloseButton, 
   ModalContent, 
@@ -10,24 +10,51 @@ import {
   ModalHeader 
 } from '@chakra-ui/react'
 
+import InputHF from '@/components/InputHF/InputHF'
+import { useCreateDrawMutation } from '@/mutations/drawMutations'
 import useModalStore from '@/store/modal/modalStore'
 
+interface IDrawForm {
+  name: string
+}
+
 const CreateDrawModal = () => {
+  const form = useForm<IDrawForm>()
+
+  const { mutate: createDraw, isSuccess } = useCreateDrawMutation()
   const { closeModal } = useModalStore()
+
+  const onSubmit = (formValues: IDrawForm) => {
+    createDraw(formValues)
+  }
+
+  React.useEffect(() => {
+    if (isSuccess) {
+      closeModal()
+    }
+  }, [isSuccess])
+
   
   return (
     <ModalContent>
-      <ModalHeader>Modal Title</ModalHeader>
-      <ModalCloseButton />
-      <ModalBody>
-        <FormControl>
-          <FormLabel>Draw name</FormLabel>
-          <Input placeholder='Draw name' />
-        </FormControl>
-      </ModalBody>
-      <ModalFooter>
-        <Button variant='ghost' onClick={closeModal}>Secondary Action</Button>
-      </ModalFooter>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+
+        <ModalHeader>Modal Title</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <FormProvider {...form}>
+            <InputHF 
+              name="name" 
+              label="Draw name"
+              inputProps={{ placeholder: 'Write a name for your draw' }} 
+            />
+          </FormProvider>
+        </ModalBody>
+        <ModalFooter>
+          <Button variant='ghost' type="submit">Create</Button>
+          <Button variant='ghost' onClick={closeModal}>Cancel</Button>
+        </ModalFooter>
+      </form>
     </ModalContent>
   )
 }
