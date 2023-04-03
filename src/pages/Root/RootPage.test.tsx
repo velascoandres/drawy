@@ -1,6 +1,7 @@
 import { describe, expect, it, Mock, vi } from 'vitest'
 
 import CreateDrawModal from '@/modals/CreateDraw/CreateDrawModal'
+import { useDeleteDrawMutation } from '@/mutations/drawMutations'
 import { useGetDrawsQuery } from '@/queries/drawQueries'
 import useModalStore from '@/store/modal/modalStore'
 import { customRender, fireEvent } from '@/test-utils/custom-render'
@@ -13,9 +14,11 @@ vi.mock('zustand')
 vi.mock('react-router-dom', () => ({
   Outlet: () => null,  
   useNavigate: () => navigateMock,
+  useParams: () => vi.fn(),
 }))
 
 vi.mock('@/queries/drawQueries')
+vi.mock('@/mutations/drawMutations')
 
 const items = [
   { id: '1', name: 'draw 1' }, 
@@ -24,11 +27,13 @@ const items = [
 
 
 const useGetDrawsQueryMock = useGetDrawsQuery as Mock
+const useDeleteDrawMutationMock = useDeleteDrawMutation as Mock
 
 describe('<DrawList /> tests', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     useGetDrawsQueryMock.mockReturnValue({ data: items })
+    useDeleteDrawMutationMock.mockReturnValue({ mutate: vi.fn() })
   })
 
   describe('When renders', () => {

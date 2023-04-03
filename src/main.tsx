@@ -8,6 +8,7 @@ import {
 
 import { ChakraProvider } from '@chakra-ui/react'
 
+import ConfirmationContainer from '@/components/ConfirmationContainer/ConfirmationContainer'
 import ModalContainer from '@/components/ModalContainer/ModalContainer'
 import ROUTES from '@/constants/routes'
 
@@ -21,6 +22,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
       <ChakraProvider>
         <RouterProvider router={router} />
         <ModalContainer />
+        <ConfirmationContainer />
       </ChakraProvider>
     </QueryClientProvider>
   </React.StrictMode>,

@@ -1,7 +1,9 @@
 import {
   FiMenu,
+  FiPlus,
+  FiTrash
 } from 'react-icons/fi'
-import { Outlet, useNavigate } from 'react-router-dom'
+import { Outlet, useNavigate, useParams } from 'react-router-dom'
 
 import { 
   Box,
@@ -11,6 +13,7 @@ import {
   Drawer,
   DrawerContent,
   Flex,
+  Heading,
   IconButton,
   Text,
   useColorModeValue,
@@ -19,14 +22,20 @@ import {
 
 import DrawList, { IDrawListItem } from '@/components/DrawList/DrawList'
 import CreateDrawModal from '@/modals/CreateDraw/CreateDrawModal'
+import { useDeleteDrawMutation } from '@/mutations/drawMutations'
 import { useGetDrawsQuery } from '@/queries/drawQueries'
+import useConfirmationStore from '@/store/confirmation/confirmationStore'
 import useModalStore from '@/store/modal/modalStore'
 
 
 const RootPage = () => {
   const { isOpen, onClose, onOpen } = useDisclosure()
   const navigate = useNavigate()
+  const params = useParams()
+
   const { openModal } = useModalStore()
+  const { openConfirmation } = useConfirmationStore()
+  const { mutate: deleteDraw } = useDeleteDrawMutation()
 
   const { data: draws = [] } = useGetDrawsQuery()
 
@@ -41,6 +50,14 @@ const RootPage = () => {
         closeOnClickOutside: false,
         closeOnEscapeKeydown: true,
       }
+    })
+  }
+
+  const handleDeleteDraw = (draw: IDrawListItem) => () => {
+    openConfirmation({
+      title: 'Confirm action',
+      content: `Do you want to delete: ${draw.name}?`,
+      onConfirm: () => deleteDraw(draw.id.toString())
     })
   }
 
@@ -61,8 +78,53 @@ const RootPage = () => {
         </Text>
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
-      <Button onClick={openCreateDrawModal}>Add draw</Button>
-      <DrawList items={draws} onSelectDraw={navigateToDrawPage} />
+      <Flex alignItems="center" justifyContent="center">
+        <Button 
+          leftIcon={<FiPlus />} 
+          variant="outline"
+          mx={4} 
+          width="100%"
+          onClick={openCreateDrawModal}
+        >
+          Add draw
+        </Button>
+      </Flex>
+      <DrawList 
+        items={draws} 
+        selectedValue={params.drawId}
+        onSelectDraw={navigateToDrawPage}
+      > 
+
+        {(draw) => (
+          <Flex 
+            direction="row" 
+            gap={2} 
+            alignContent="space-between" 
+            width="100%"
+            alignItems="center"
+          >
+            <Heading 
+              as='h6' 
+              size='xs' 
+              width="100%"
+              noOfLines={1}
+            >
+              {draw.name}
+            </Heading>
+            <IconButton 
+              aria-label="delete draw"
+              size='sm'
+              bg="transparent"
+              icon={<FiTrash />}
+              onClick={handleDeleteDraw(draw)} 
+              _hover={{
+                bg: 'white',
+                color: 'black'
+              }}
+            />
+          </Flex>
+        )}
+      </DrawList>
     </Box>
   )
 

@@ -1,7 +1,5 @@
 import React from 'react'
 
-import { Box } from '@chakra-ui/react'
-
 import { DrawListContext } from './DrawListContext'
 import DrawListItem from './DrawListItem'
 
@@ -12,11 +10,13 @@ export interface IDrawListItem {
 
 export interface IDrawListProps {
     items: IDrawListItem[]
+    selectedValue?: string
     onSelectDraw: (item: IDrawListItem) => void
+    children: (item: IDrawListItem, isSelected: boolean) => React.ReactNode
 }
 
 const DrawList = (props: IDrawListProps) => {
-  const { items, onSelectDraw } = props
+  const { items, selectedValue, onSelectDraw, children } = props
   const [selectedItem, setSelectedItem] = React.useState<IDrawListItem>()
 
   const handleSelectDrawFromList = (item: IDrawListItem) => {
@@ -24,18 +24,25 @@ const DrawList = (props: IDrawListProps) => {
     onSelectDraw(item)
   }
 
+  React.useEffect(() => {
+    const selectedDraw = items.find(({ id }) => id === selectedValue)
+    
+    if (selectedDraw) {
+      setSelectedItem(selectedDraw)
+    }
+    
+  }, [selectedValue, items])
+
   return (
     <DrawListContext.Provider value={{
       selectedItem,
       onSelectItem: handleSelectDrawFromList,
     }}>
-      <Box
-        padding="2"
-      >
-        {items.map((draw) => (
-          <DrawListItem key={draw.id} item={draw} />
-        ))}
-      </Box>
+      {items.map((draw) => (
+        <DrawListItem key={draw.id} item={draw} >
+          {children(draw, selectedItem?.id === draw.id)}
+        </DrawListItem>
+      ))}
     </DrawListContext.Provider>
   )
 }
