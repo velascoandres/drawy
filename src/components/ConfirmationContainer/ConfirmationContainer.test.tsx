@@ -10,11 +10,6 @@ import ConfirmationContainer from './ConfirmationContainer'
 
 vi.mock('zustand')
 
-const mockModalSimpleModal = {
-  component: () => <div>Mock Modal</div>,
-  componentProps: {}
-}
-
 describe('<ModalContainer /> tests', () => {     
   it('should show the confirmation content', () => {
     confirmationStore.setState({

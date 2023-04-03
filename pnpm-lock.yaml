@@ -21,6 +21,7 @@ specifiers:
   eslint-plugin-react-hooks: ^4.6.0
   eslint-plugin-simple-import-sort: ^10.0.0
   framer-motion: ^10.9.1
+  husky: ^8.0.0
   install: ^0.13.0
   jsdom: ^21.1.1
   react: ^18.2.0
@@ -65,6 +66,7 @@ devDependencies:
   eslint-plugin-react: 7.32.2_eslint@8.36.0
   eslint-plugin-react-hooks: 4.6.0_eslint@8.36.0
   eslint-plugin-simple-import-sort: 10.0.0_eslint@8.36.0
+  husky: 8.0.3
   jsdom: 21.1.1
   typescript: 4.9.5
   vite: 4.2.1
@@ -3270,6 +3272,12 @@ packages:
       debug: 4.3.4
     transitivePeerDependencies:
       - supports-color
+    dev: true
+
+  /husky/8.0.3:
+    resolution: {integrity: sha512-+dQSyqPh4x1hlO1swXBiNb2HzTDN1I2IGLQx1GrBuiqFJfoMrnZWwVmatvSiO+Iz8fBUnf+lekwNo4c2LlXItg==}
+    engines: {node: '>=14'}
+    hasBin: true
     dev: true
 
   /iconv-lite/0.6.3:

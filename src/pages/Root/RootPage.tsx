@@ -72,7 +72,7 @@ const RootPage = () => {
       h="full"
       {...props}
     >
-      <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
+      <Flex h="20" alignItems="center" mx="8" justifyContent="center">
         <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
             Drawy
         </Text>
@@ -112,7 +112,7 @@ const RootPage = () => {
               {draw.name}
             </Heading>
             <IconButton 
-              aria-label="delete draw"
+              aria-label="delete-draw"
               size='sm'
               bg="transparent"
               icon={<FiTrash />}
