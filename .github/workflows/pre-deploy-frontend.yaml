@@ -26,10 +26,10 @@ jobs:
             - args: [--global, gulp, prettier, typescript]
 
       - name: Install dependencies
-      - run: pnpm install
+        run: pnpm install
 
       - name: Check lint
-      - run: pnpm run lint
+        run: pnpm run lint
 
       - name: Check tests
-      - run: pnpm test
+        run: pnpm test
