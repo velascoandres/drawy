@@ -43,8 +43,10 @@ export const useUpdateDrawMutation = () => {
     },
     onMutate: async (updatedDraw: IDraw) => {
       await queryClient.cancelQueries({ queryKey: ['draws'] })
+      await queryClient.cancelQueries({ queryKey: 'draw' })
   
       const previousDraws = queryClient.getQueryData(['draws'])
+      const previousDraw = queryClient.getQueryData(['draw', updatedDraw.id]) as IDraw
   
       queryClient.setQueryData(['draws'], (old: IDraw[] | undefined) => {
         const prev = old || []
@@ -52,11 +54,14 @@ export const useUpdateDrawMutation = () => {
 
         return prev.splice(index, 1, updatedDraw)
       })
+
+      queryClient.setQueryData(['draw', updatedDraw.id], { ...updatedDraw })
   
-      return { previousDraws }
+      return { previousDraws, previousDraw }
     },
     onError: (_err, _newDraw, context) => {
       queryClient.setQueryData(['draws'], context?.previousDraws)
+      queryClient.setQueryData(['draw', context?.previousDraw?.id || ''], context?.previousDraw)
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['draws'] })

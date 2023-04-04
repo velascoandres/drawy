@@ -20,6 +20,7 @@ export const useGetDrawsQuery = () => {
 export const useGetDrawByIdQuery = (id: string) => {
   return useQuery({
     queryKey: ['draw', id],
+    enabled: Boolean(id),
     queryFn: async () => {
       const response = await drawService.findOneDraw(id)
 

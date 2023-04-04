@@ -78,7 +78,7 @@ const RootPage = () => {
         </Text>
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
-      <Flex alignItems="center" justifyContent="center">
+      <Flex alignItems="center" justifyContent="center" marginBottom="5">
         <Button 
           leftIcon={<FiPlus />} 
           variant="outline"

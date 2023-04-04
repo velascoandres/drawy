@@ -23,7 +23,7 @@ const createDraw = async (newDraw: Omit<IDraw, 'id'>): Promise<IBackendResponse<
 const updateDraw = async (id: string, draw: Omit<IDraw, 'id'>): Promise<IBackendResponse<boolean>> => {
   const result = await invoke('update_draw_command', {
     drawId: id,
-    newName: draw,
+    name: draw.name,
     elementsMeta: JSON.stringify(draw.elements || [])
   })
 
