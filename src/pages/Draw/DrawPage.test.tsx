@@ -16,6 +16,10 @@ vi.mock('react-router-dom', () => ({
 vi.mock('@/queries/drawQueries')
 vi.mock('@/mutations/drawMutations')
 
+vi.mock('@excalidraw/excalidraw', () => ({
+  Excalidraw: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}))
+
 const updateDrawMock = vi.fn()
 
 const useGetDrawByIdQueryMock = useGetDrawByIdQuery as Mock

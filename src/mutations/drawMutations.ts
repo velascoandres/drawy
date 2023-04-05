@@ -63,8 +63,9 @@ export const useUpdateDrawMutation = () => {
       queryClient.setQueryData(['draws'], context?.previousDraws)
       queryClient.setQueryData(['draw', context?.previousDraw?.id || ''], context?.previousDraw)
     },
-    onSettled: () => {
+    onSettled: (data, err, variables) => {
       queryClient.invalidateQueries({ queryKey: ['draws'] })
+      queryClient.invalidateQueries({ queryKey: ['draw', variables.id] })
     },
   })
 }

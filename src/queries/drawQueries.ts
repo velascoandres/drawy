@@ -1,6 +1,6 @@
 import { useQuery } from 'react-query'
 
-import drawService from '@/services/drawService'
+import drawService, { IDraw } from '@/services/drawService'
 
 export const useGetDrawsQuery = () => {
   return useQuery({
@@ -13,7 +13,7 @@ export const useGetDrawsQuery = () => {
       }
 
       return response.data  
-    }
+    },
   })
 }
 
@@ -21,6 +21,17 @@ export const useGetDrawByIdQuery = (id: string) => {
   return useQuery({
     queryKey: ['draw', id],
     enabled: Boolean(id),
+    select: (data): IDraw | null => {
+      if (!data) {
+        return null
+      }
+
+      return {
+        id:  data.id,
+        name: data.name,
+        scene: data?.raw_elements ? JSON.parse(data?.raw_elements) : undefined
+      } 
+    },
     queryFn: async () => {
       const response = await drawService.findOneDraw(id)
 
@@ -28,7 +39,8 @@ export const useGetDrawByIdQuery = (id: string) => {
         throw new Error('Error on fetching draw')
       }
 
-      return response.data  
+
+      return response.data
     }
   })
 }

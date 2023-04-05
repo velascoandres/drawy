@@ -1,3 +1,4 @@
+import React from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import {
   FiCheck,
@@ -6,14 +7,20 @@ import {
 import { useParams } from 'react-router-dom'
 
 import { 
-  Container, 
+  Box,
   Divider, 
   Flex, 
   Heading,
   IconButton,
   useDisclosure,
-  VStack 
 } from '@chakra-ui/react'
+import {
+  Excalidraw,
+} from '@excalidraw/excalidraw'
+import {
+  AppState,
+  ExcalidrawImperativeAPI,
+} from '@excalidraw/excalidraw/types/types'
 
 import InputHF from '@/components/InputHF/InputHF'
 import { useUpdateDrawMutation } from '@/mutations/drawMutations'
@@ -22,7 +29,7 @@ import { useGetDrawByIdQuery } from '@/queries/drawQueries'
 const DrawPage = () => {
   const params = useParams()
   const { data: draw } = useGetDrawByIdQuery(params.drawId as string)
-  const { mutate: updateDraw } = useUpdateDrawMutation()
+  const { mutate: updateDraw, isSuccess } = useUpdateDrawMutation()
   const form = useForm<{name: string}>({
     values: {
       name: draw?.name || ''
@@ -30,9 +37,19 @@ const DrawPage = () => {
   })
 
   const { isOpen: isEditingName, onToggle } = useDisclosure()
-  
+
+  const [viewModeEnabled, setViewModeEnabled] = React.useState(false)
+  const [gridModeEnabled, setGridModeEnabled] = React.useState(false)
+  const [theme, setTheme] = React.useState('dark')
+
+  const [
+    excalidrawAPI,
+    setExcalidrawAPI
+  ] = React.useState<ExcalidrawImperativeAPI | null>(null)
+
+
   const handleUpdateName = ({ name }:{name: string}) => {
-    updateDraw({ id: params.drawId as string, name })
+    updateDraw({ id: params.drawId as string, name, scene: draw?.scene })
     onToggle()
   }
 
@@ -41,9 +58,29 @@ const DrawPage = () => {
     onToggle()
   }
 
+  const handleChange = (elements: any[], appState: AppState) => {
+    if (!draw) {
+      return
+    }
+    updateDraw({
+      id: draw.id,
+      name: draw.name,
+      scene: { elements, appState } 
+    })
+  }
+
+  React.useEffect(() => {
+    if (draw?.scene) {
+      excalidrawAPI?.updateScene(draw.scene)
+      excalidrawAPI?.scrollToContent()
+    } else {
+      excalidrawAPI?.resetScene()
+    }
+  }, [draw])
+
 
   return (
-    <VStack align="start">
+    <Flex align="start" direction="column">
       <Flex direction="row" justifyContent="start">
         {
           isEditingName ? (
@@ -65,13 +102,24 @@ const DrawPage = () => {
             </Heading>
           )
         }
-      
       </Flex>
       <Divider orientation="horizontal" />
-      <Container maxW="3xl">
-          Content
-      </Container>
-    </VStack>
+      <Box position="relative" width="100%">
+        <Box height="-webkit-fill-available" width="100%" position="absolute" paddingY={4}>
+          <Excalidraw
+            ref={(api: ExcalidrawImperativeAPI) => setExcalidrawAPI(api)}
+            onChange={(_elements, _state) => {
+              // handleChange([...elements], state)
+            }}
+            viewModeEnabled={viewModeEnabled}
+            gridModeEnabled={gridModeEnabled}
+            theme={theme}
+            name="Custom name of drawing"
+            UIOptions={{ canvasActions: { loadScene: false } }}
+          />
+        </Box>
+      </Box>
+    </Flex>
   )
 }
 

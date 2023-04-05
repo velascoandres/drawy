@@ -3,7 +3,13 @@ import { invoke } from '@tauri-apps/api'
 export interface IDraw {
     id: string
     name: string
-    elements?: Record<string, unknown>[]
+    scene?: Record<string, unknown>
+}
+
+export interface IRawDraw {
+  id: string
+  name: string
+  raw_elements?: string
 }
 
 export interface IBackendResponse<T> {
@@ -14,7 +20,7 @@ export interface IBackendResponse<T> {
 const createDraw = async (newDraw: Omit<IDraw, 'id'>): Promise<IBackendResponse<string>> => {
   const result = await invoke('create_draw_command', {
     name: newDraw.name,
-    elementsMeta: JSON.stringify(newDraw.elements || [])
+    elementsMeta: JSON.stringify(newDraw.scene || {})
   })
 
   return JSON.parse(result as string)
@@ -24,7 +30,7 @@ const updateDraw = async (id: string, draw: Omit<IDraw, 'id'>): Promise<IBackend
   const result = await invoke('update_draw_command', {
     drawId: id,
     name: draw.name,
-    elementsMeta: JSON.stringify(draw.elements || [])
+    elementsMeta: JSON.stringify(draw.scene || {})
   })
 
   return JSON.parse(result as string)
@@ -37,13 +43,13 @@ const deleteDraw = async (id: string): Promise<IBackendResponse<boolean>> => {
   return JSON.parse(result as string)
 }
 
-const findDraws = async (): Promise<IBackendResponse<IDraw[]>> => {
+const findDraws = async (): Promise<IBackendResponse<IRawDraw[]>> => {
   const result = await invoke('find_all_draws_command')
 
   return JSON.parse(result as string)
 }
 
-const findOneDraw = async (id: string): Promise<IBackendResponse<IDraw>> => {
+const findOneDraw = async (id: string): Promise<IBackendResponse<IRawDraw>> => {
   const result = await invoke('find_one_draw_command', {
     drawId: id,
   })
