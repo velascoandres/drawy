@@ -18,6 +18,7 @@ import {
   Excalidraw,
 } from '@excalidraw/excalidraw'
 import {
+  AppState,
   ExcalidrawImperativeAPI,
 } from '@excalidraw/excalidraw/types/types'
 
@@ -45,9 +46,9 @@ const DrawPage = () => {
 
   const debounceUpdateScene = useDebounceCallback(UPDATE_SCENE_DEBOUNCE)
 
-  const [viewModeEnabled, setViewModeEnabled] = React.useState(false)
-  const [gridModeEnabled, setGridModeEnabled] = React.useState(false)
-  const [theme, setTheme] = React.useState('dark')
+  const [viewModeEnabled] = React.useState(false)
+  const [gridModeEnabled] = React.useState(false)
+  const [theme] = React.useState('light')
 
   const [
     excalidrawAPI,
@@ -65,7 +66,7 @@ const DrawPage = () => {
     onToggle()
   }
 
-  const handleChange = (elements: any[]) => {
+  const handleChange = (elements: any[], appState: AppState) => {
     if (!draw) {
       return
     }
@@ -74,7 +75,11 @@ const DrawPage = () => {
       name: draw.name,
       scene: { 
         elements, 
-        appState: initialData.appState, 
+        appState: {
+          viewBackgroundColor: appState.viewBackgroundColor,
+          currentItemFontFamily: appState.currentItemFontFamily,
+          currentItemFontSize: appState.currentItemFontSize
+        }, 
         scrollToContent: true, 
         libraryItems: initialData.libraryItems
       } 
@@ -82,9 +87,9 @@ const DrawPage = () => {
   }
 
   React.useEffect(() => {
-    if (draw?.scene && !hasLoadedDrawRef.current) {
-      excalidrawAPI?.updateScene(draw.scene)
-      excalidrawAPI?.scrollToContent()
+    if (draw?.scene && !hasLoadedDrawRef.current && excalidrawAPI) {
+      excalidrawAPI.updateScene(draw.scene)
+      excalidrawAPI.scrollToContent()
       hasLoadedDrawRef.current = true
     }
   }, [draw?.scene])
@@ -123,8 +128,8 @@ const DrawPage = () => {
         <Box height="-webkit-fill-available" width="100%" position="absolute" paddingY={4}>
           <Excalidraw
             ref={(api: ExcalidrawImperativeAPI) => setExcalidrawAPI(api)}
-            onChange={(elements) => {
-              debounceUpdateScene(() => handleChange([...elements]))
+            onChange={(elements, appState) => {
+              debounceUpdateScene(() => handleChange([...elements], appState))
             }}
             viewModeEnabled={viewModeEnabled}
             gridModeEnabled={gridModeEnabled}

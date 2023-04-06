@@ -1,3 +1,4 @@
+import { useIsFetching, useIsMutating } from 'react-query'
 import { describe, expect, it, Mock, vi } from 'vitest'
 
 import userEvent from '@testing-library/user-event'
@@ -22,6 +23,7 @@ vi.mock('react-router-dom', () => ({
 
 vi.mock('@/queries/drawQueries')
 vi.mock('@/mutations/drawMutations')
+vi.mock('react-query')
 
 const items = [
   { id: '1', name: 'draw 1' }, 
@@ -32,12 +34,16 @@ const deleteMock = vi.fn()
 
 const useGetDrawsQueryMock = useGetDrawsQuery as Mock
 const useDeleteDrawMutationMock = useDeleteDrawMutation as Mock
+const isFetchingMock = useIsFetching as Mock
+const isMutatingMock = useIsMutating as Mock
 
 describe('<DrawList /> tests', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     useGetDrawsQueryMock.mockReturnValue({ data: items })
     useDeleteDrawMutationMock.mockReturnValue({ mutate: deleteMock })
+    isFetchingMock.mockReturnValue(0)
+    isMutatingMock.mockReturnValue(0)
   })
 
   describe('When renders', () => {

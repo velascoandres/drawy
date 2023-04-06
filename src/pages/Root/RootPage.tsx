@@ -21,6 +21,7 @@ import {
 } from '@chakra-ui/react'
 
 import DrawList, { IDrawListItem } from '@/components/DrawList/DrawList'
+import StatusBar from '@/components/StatusBar/StatusBar'
 import CreateDrawModal from '@/modals/CreateDraw/CreateDrawModal'
 import { useDeleteDrawMutation } from '@/mutations/drawMutations'
 import { useGetDrawsQuery } from '@/queries/drawQueries'
@@ -168,6 +169,7 @@ const RootPage = () => {
       <Box ml={{ base: 0, md: 60 }} p="4">
         <Outlet />
       </Box>
+      <StatusBar />
     </Box>
   )
 }

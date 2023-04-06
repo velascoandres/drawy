@@ -21,6 +21,7 @@ export const useGetDrawByIdQuery = (id: string) => {
   return useQuery({
     queryKey: ['draw', id],
     enabled: Boolean(id),
+    cacheTime: 0,
     select: (data): IDraw | null => {
       if (!data) {
         return null
