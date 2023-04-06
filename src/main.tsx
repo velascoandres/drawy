@@ -17,7 +17,7 @@ const router = createBrowserRouter(ROUTES)
 const queryClient = new QueryClient()
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
+  <>
     <QueryClientProvider client={queryClient}>
       <ChakraProvider>
         <RouterProvider router={router} />
@@ -25,5 +25,5 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         <ConfirmationContainer />
       </ChakraProvider>
     </QueryClientProvider>
-  </React.StrictMode>,
+  </>,
 )

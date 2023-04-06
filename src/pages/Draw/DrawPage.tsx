@@ -18,25 +18,32 @@ import {
   Excalidraw,
 } from '@excalidraw/excalidraw'
 import {
-  AppState,
   ExcalidrawImperativeAPI,
 } from '@excalidraw/excalidraw/types/types'
 
 import InputHF from '@/components/InputHF/InputHF'
+import initialData from '@/constants/initial-data'
+import useDebounceCallback from '@/hooks/useDebounceCallback'
 import { useUpdateDrawMutation } from '@/mutations/drawMutations'
 import { useGetDrawByIdQuery } from '@/queries/drawQueries'
+
+const UPDATE_SCENE_DEBOUNCE = 1000
 
 const DrawPage = () => {
   const params = useParams()
   const { data: draw } = useGetDrawByIdQuery(params.drawId as string)
-  const { mutate: updateDraw, isSuccess } = useUpdateDrawMutation()
+  const { mutate: updateDraw } = useUpdateDrawMutation()
   const form = useForm<{name: string}>({
     values: {
       name: draw?.name || ''
     }
   })
 
+  const hasLoadedDrawRef = React.useRef<boolean>(false)
   const { isOpen: isEditingName, onToggle } = useDisclosure()
+
+
+  const debounceUpdateScene = useDebounceCallback(UPDATE_SCENE_DEBOUNCE)
 
   const [viewModeEnabled, setViewModeEnabled] = React.useState(false)
   const [gridModeEnabled, setGridModeEnabled] = React.useState(false)
@@ -58,26 +65,34 @@ const DrawPage = () => {
     onToggle()
   }
 
-  const handleChange = (elements: any[], appState: AppState) => {
+  const handleChange = (elements: any[]) => {
     if (!draw) {
       return
     }
     updateDraw({
       id: draw.id,
       name: draw.name,
-      scene: { elements, appState } 
+      scene: { 
+        elements, 
+        appState: initialData.appState, 
+        scrollToContent: true, 
+        libraryItems: initialData.libraryItems
+      } 
     })
   }
 
   React.useEffect(() => {
-    if (draw?.scene) {
+    if (draw?.scene && !hasLoadedDrawRef.current) {
       excalidrawAPI?.updateScene(draw.scene)
       excalidrawAPI?.scrollToContent()
-    } else {
-      excalidrawAPI?.resetScene()
+      hasLoadedDrawRef.current = true
     }
-  }, [draw])
+  }, [draw?.scene])
 
+  React.useEffect(() => {
+    excalidrawAPI?.resetScene()
+    hasLoadedDrawRef.current = false
+  }, [params.drawId])
 
   return (
     <Flex align="start" direction="column">
@@ -108,8 +123,8 @@ const DrawPage = () => {
         <Box height="-webkit-fill-available" width="100%" position="absolute" paddingY={4}>
           <Excalidraw
             ref={(api: ExcalidrawImperativeAPI) => setExcalidrawAPI(api)}
-            onChange={(_elements, _state) => {
-              // handleChange([...elements], state)
+            onChange={(elements) => {
+              debounceUpdateScene(() => handleChange([...elements]))
             }}
             viewModeEnabled={viewModeEnabled}
             gridModeEnabled={gridModeEnabled}

@@ -29,7 +29,7 @@ export const useCreateDrawMutation = () => {
 }
 
 export const useUpdateDrawMutation = () => {
-  const queryClient = useQueryClient()
+  // const queryClient = useQueryClient()
   
   return useMutation({
     mutationFn: async (draw: IDraw) => {
@@ -41,32 +41,32 @@ export const useUpdateDrawMutation = () => {
   
       return response.data
     },
-    onMutate: async (updatedDraw: IDraw) => {
-      await queryClient.cancelQueries({ queryKey: ['draws'] })
-      await queryClient.cancelQueries({ queryKey: 'draw' })
+    // onMutate: async (updatedDraw: IDraw) => {
+    //   await queryClient.cancelQueries({ queryKey: ['draws'] })
+    //   // await queryClient.cancelQueries({ queryKey: ['draw', updatedDraw.id] })
   
-      const previousDraws = queryClient.getQueryData(['draws'])
-      const previousDraw = queryClient.getQueryData(['draw', updatedDraw.id]) as IDraw
+    //   const previousDraws = queryClient.getQueryData(['draws'])
+    //   // const previousDraw = queryClient.getQueryData(['draw', updatedDraw.id]) as IDraw
   
-      queryClient.setQueryData(['draws'], (old: IDraw[] | undefined) => {
-        const prev = old || []
-        const index = prev.findIndex(prevDraw => prevDraw.id === updatedDraw.id)
+    //   queryClient.setQueryData(['draws'], (old: IDraw[] | undefined) => {
+    //     const prev = old || []
+    //     const index = prev.findIndex(prevDraw => prevDraw.id === updatedDraw.id)
 
-        return prev.splice(index, 1, updatedDraw)
-      })
+    //     return prev.splice(index, 1, updatedDraw)
+    //   })
 
-      queryClient.setQueryData(['draw', updatedDraw.id], { ...updatedDraw })
+    //   // queryClient.setQueryData(['draw', updatedDraw.id], { ...updatedDraw })
   
-      return { previousDraws, previousDraw }
-    },
-    onError: (_err, _newDraw, context) => {
-      queryClient.setQueryData(['draws'], context?.previousDraws)
-      queryClient.setQueryData(['draw', context?.previousDraw?.id || ''], context?.previousDraw)
-    },
-    onSettled: (data, err, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['draws'] })
-      queryClient.invalidateQueries({ queryKey: ['draw', variables.id] })
-    },
+    //   return { previousDraws }
+    // },
+    // onError: (_err, _newDraw, context) => {
+    //   queryClient.setQueryData(['draws'], context?.previousDraws)
+    //   // queryClient.setQueryData(['draw', context?.previousDraw?.id || ''], context?.previousDraw)
+    // },
+    // onSettled: () => {
+    //   queryClient.invalidateQueries({ queryKey: ['draws'] })
+    //   // queryClient.invalidateQueries({ queryKey: ['draw', variables.id] })
+    // },
   })
 }
 
