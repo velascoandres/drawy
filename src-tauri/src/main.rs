@@ -19,6 +19,7 @@ fn main() {
             find_all_draws_command,
             delete_draw_command,
             update_draw_command,
+            find_info_draws_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

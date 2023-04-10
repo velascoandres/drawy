@@ -1,4 +1,4 @@
-use crate::models::{Draw};
+use crate::models::{Draw, DrawInfo};
 use diesel::prelude::*;
 use diesel::result::Error;
 use uuid::Uuid;
@@ -24,6 +24,19 @@ pub fn find_all_draws(conn: &mut SqliteConnection) -> Result<Vec<Draw>, Error> {
     use crate::schema::draws::dsl::*;
 
     draws.load::<Draw>(conn)
+}
+
+pub fn find_info_draws_paginated(conn: &mut SqliteConnection, limit: i64) -> Result<(Vec<DrawInfo>, i64), Error> {
+    use crate::schema::draws::dsl::*;
+
+    let selection = draws.select(
+        (id, name)
+    );
+
+    let data = selection.limit(limit).load::<DrawInfo>(conn)?;
+    let count = selection.count().get_result(conn)?;
+
+    Ok((data, count))
 }
 
 pub fn find_one_draw(conn: &mut SqliteConnection, draw_id: String) -> Result<Option<Draw>, Error> {

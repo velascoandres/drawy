@@ -24,7 +24,7 @@ import DrawList, { IDrawListItem } from '@/components/DrawList/DrawList'
 import StatusBar from '@/components/StatusBar/StatusBar'
 import CreateDrawModal from '@/modals/CreateDraw/CreateDrawModal'
 import { useDeleteDrawMutation } from '@/mutations/drawMutations'
-import { useGetDrawsQuery } from '@/queries/drawQueries'
+import { useGetDrawsInfoQuery, useGetDrawsQuery } from '@/queries/drawQueries'
 import useConfirmationStore from '@/store/confirmation/confirmationStore'
 import useModalStore from '@/store/modal/modalStore'
 
@@ -38,7 +38,7 @@ const RootPage = () => {
   const { openConfirmation } = useConfirmationStore()
   const { mutate: deleteDraw } = useDeleteDrawMutation()
 
-  const { data: draws = [] } = useGetDrawsQuery()
+  const { data: response } = useGetDrawsInfoQuery()
 
   const navigateToDrawPage = (item: IDrawListItem) => {
     navigate(`/draw/${item.id}`)
@@ -91,7 +91,7 @@ const RootPage = () => {
         </Button>
       </Flex>
       <DrawList 
-        items={draws} 
+        items={response?.results || []} 
         selectedValue={params.drawId}
         onSelectDraw={navigateToDrawPage}
       > 

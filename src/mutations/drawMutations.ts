@@ -2,6 +2,7 @@
 /* eslint-disable max-params */
 import { useMutation, useQueryClient } from 'react-query'
 
+import { IDrawInfoQueryResponse } from '@/queries/drawQueries'
 import drawService, { IDraw } from '@/services/drawService'
 
 export const useCreateDrawMutation = () => {
@@ -18,19 +19,27 @@ export const useCreateDrawMutation = () => {
       return response.data as string
     },
     onSuccess: async (newDrawId: string, drawPayload: Omit<IDraw, 'id'>) => {
-      const newDraw = {
+      const newDrawInfo = {
         id: newDrawId,
-        ...drawPayload
+        name: drawPayload.name,
       }
 
-      queryClient.setQueryData('draws', (old: IDraw[] | undefined) => [...old || [], newDraw])
+      queryClient.setQueryData('draws_info', (old: IDrawInfoQueryResponse | undefined) => {
+        const prev = old || { results: [], count: 0 }
+
+        const updatedResults = [newDrawInfo, ...prev.results]
+
+        return {
+          ...prev,
+          results: updatedResults,
+          count: prev.count + 1
+        }
+      })
     }
   })
 }
 
-export const useUpdateDrawMutation = () => {
-  // const queryClient = useQueryClient()
-  
+export const useUpdateDrawMutation = () => {  
   return useMutation({
     mutationFn: async (draw: IDraw) => {
       const response = await drawService.updateDraw(draw.id, draw)
@@ -41,32 +50,6 @@ export const useUpdateDrawMutation = () => {
   
       return response.data
     },
-    // onMutate: async (updatedDraw: IDraw) => {
-    //   await queryClient.cancelQueries({ queryKey: ['draws'] })
-    //   // await queryClient.cancelQueries({ queryKey: ['draw', updatedDraw.id] })
-  
-    //   const previousDraws = queryClient.getQueryData(['draws'])
-    //   // const previousDraw = queryClient.getQueryData(['draw', updatedDraw.id]) as IDraw
-  
-    //   queryClient.setQueryData(['draws'], (old: IDraw[] | undefined) => {
-    //     const prev = old || []
-    //     const index = prev.findIndex(prevDraw => prevDraw.id === updatedDraw.id)
-
-    //     return prev.splice(index, 1, updatedDraw)
-    //   })
-
-    //   // queryClient.setQueryData(['draw', updatedDraw.id], { ...updatedDraw })
-  
-    //   return { previousDraws }
-    // },
-    // onError: (_err, _newDraw, context) => {
-    //   queryClient.setQueryData(['draws'], context?.previousDraws)
-    //   // queryClient.setQueryData(['draw', context?.previousDraw?.id || ''], context?.previousDraw)
-    // },
-    // onSettled: () => {
-    //   queryClient.invalidateQueries({ queryKey: ['draws'] })
-    //   // queryClient.invalidateQueries({ queryKey: ['draw', variables.id] })
-    // },
   })
 }
 
@@ -84,24 +67,29 @@ export const useDeleteDrawMutation = () => {
       return response.data
     },
     onMutate: async (drawId: string) => {
-      await queryClient.cancelQueries({ queryKey: ['draws'] })
+      await queryClient.cancelQueries({ queryKey: ['draws_info'] })
     
-      const previousDraws = queryClient.getQueryData(['draws'])
+      const previousDraws = queryClient.getQueryData(['draws_info'])
     
-      queryClient.setQueryData(['draws'], (old: IDraw[] | undefined) => {
-        const prev = old || []
-        const index = prev.findIndex(prevDraw => prevDraw.id === drawId)
+      queryClient.setQueryData(['draws_info'], (old: IDrawInfoQueryResponse | undefined) => {
+        const prev = old || { results: [], count: 0 }
+        const index = prev.results.findIndex(prevDraw => prevDraw.id === drawId)
 
-        return prev.splice(index, 1)
+        const updatedResults = prev.results.splice(index, 1)
+
+        return {
+          count: prev.count - 1,
+          results: updatedResults,
+        }
       })
     
       return { previousDraws }
     },
     onError: (_err, _newDraw, context) => {
-      queryClient.setQueryData(['draws'], context?.previousDraws)
+      queryClient.setQueryData(['draws_info'], context?.previousDraws)
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['draws'] })
+      queryClient.invalidateQueries({ queryKey: ['draws_info'] })
     },
   })
 }

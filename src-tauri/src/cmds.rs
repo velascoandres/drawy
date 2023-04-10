@@ -1,12 +1,19 @@
 use diesel::result::Error;
 use serde::Serialize;
 
-use crate::{draws, state::AppState};
+use crate::{draws, state::AppState, models::DrawInfo};
 
 #[derive(Serialize)]
 struct Response<T> {
     error: Option<String>,
     data: Option<T>
+}
+
+#[derive(Serialize)]
+pub struct PagitanedResponse<T> {
+    pub data: Option<Vec<T>>,
+    pub count: i64,
+    error: Option<String>,
 }
 
 #[tauri::command]
@@ -78,3 +85,18 @@ pub fn delete_draw_command(draw_id: String, state: tauri::State<AppState>) -> St
 
     serde_json::to_string(&response).unwrap()
 }
+
+#[tauri::command]
+pub fn find_info_draws_command(limit: i64, state: tauri::State<AppState>) -> String {
+    let conn = &mut *state.conn.lock().unwrap();
+
+    let result = draws::find_info_draws_paginated(conn, limit);
+
+    let response = match result {
+        Ok((info, count)) => PagitanedResponse::<DrawInfo> { data: Some(info), count, error: None },
+        Err(Error::DatabaseError(e, _)) => PagitanedResponse::<DrawInfo> { data: None, count: 0,error: Some(format!("Database error: {:?}", e)) },
+        _ => PagitanedResponse::<DrawInfo> { data: None, count: 0, error: Some("An error has occured".to_string()) },
+    };
+
+    serde_json::to_string(&response).unwrap()
+} 

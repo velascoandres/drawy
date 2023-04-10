@@ -12,9 +12,18 @@ export interface IRawDraw {
   raw_elements?: string
 }
 
+export interface IDrawInfo {
+  id: string
+  name: string
+}
+
 export interface IBackendResponse<T> {
     error?: string
     data?: T
+}
+
+export interface IPaginatedResponse<T> extends IBackendResponse<T> {
+  count: number
 }
 
 const createDraw = async (newDraw: Omit<IDraw, 'id'>): Promise<IBackendResponse<string>> => {
@@ -57,10 +66,19 @@ const findOneDraw = async (id: string): Promise<IBackendResponse<IRawDraw>> => {
   return JSON.parse(result as string)
 }
 
+const findDrawsInfo = async (limit: number): Promise<IPaginatedResponse<IDrawInfo[]>> => {
+  const result = await invoke('find_info_draws_command', {
+    limit,
+  })
+
+  return JSON.parse(result as string)
+}
+
 export default {
   createDraw,
   updateDraw,
   deleteDraw,
   findDraws,
-  findOneDraw
+  findOneDraw,
+  findDrawsInfo
 }

@@ -12,6 +12,12 @@ pub struct Draw {
     pub raw_elements: Option<String>,
 }
 
+#[derive(Queryable, Debug, Serialize)]
+pub struct DrawInfo {
+    pub id: String,
+    pub name: String,
+}
+
 #[derive(Insertable)]
 #[table_name = "draws"]
 pub struct NewDraw {

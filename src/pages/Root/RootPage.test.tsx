@@ -6,7 +6,7 @@ import userEvent from '@testing-library/user-event'
 import ConfirmationContainer from '@/components/ConfirmationContainer/ConfirmationContainer'
 import CreateDrawModal from '@/modals/CreateDraw/CreateDrawModal'
 import { useDeleteDrawMutation } from '@/mutations/drawMutations'
-import { useGetDrawsQuery } from '@/queries/drawQueries'
+import { useGetDrawsInfoQuery } from '@/queries/drawQueries'
 import useModalStore from '@/store/modal/modalStore'
 import { customRender } from '@/test-utils/custom-render'
 
@@ -32,15 +32,15 @@ const items = [
 
 const deleteMock = vi.fn()
 
-const useGetDrawsQueryMock = useGetDrawsQuery as Mock
+const useGetDrawsInfoQueryMock = useGetDrawsInfoQuery as Mock
 const useDeleteDrawMutationMock = useDeleteDrawMutation as Mock
 const isFetchingMock = useIsFetching as Mock
 const isMutatingMock = useIsMutating as Mock
 
-describe('<DrawList /> tests', () => {
+describe('<RootPage /> tests', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    useGetDrawsQueryMock.mockReturnValue({ data: items })
+    useGetDrawsInfoQueryMock.mockReturnValue({ data: { results: items, count: items.length } })
     useDeleteDrawMutationMock.mockReturnValue({ mutate: deleteMock })
     isFetchingMock.mockReturnValue(0)
     isMutatingMock.mockReturnValue(0)
