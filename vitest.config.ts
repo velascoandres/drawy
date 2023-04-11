@@ -22,6 +22,7 @@ export default defineConfig({
       '@/store': path.resolve(__dirname, './src/store/'),
       '@/modals': path.resolve(__dirname, './src/modals/'),
       '@/test-utils': path.resolve(__dirname, './test-utils/'),
+      '@/styles': path.resolve(__dirname, './src/styles/'),
     }
   },
 })

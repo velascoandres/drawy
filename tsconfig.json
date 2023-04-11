@@ -27,6 +27,7 @@
       "@/hooks/*": ["src/hooks/*"],
       "@/store/*": ["src/store/*"],
       "@/modals/*": ["src/modals/*"],
+      "@/styles/*": ["src/styles/*"],
       "@/test-utils/*": ["test-utils/*"],
     },
     "types": ["vitest/globals"]

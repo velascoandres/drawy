@@ -21,6 +21,7 @@ export default defineConfig({
       '@/mutations': path.resolve(__dirname, './src/mutations/'),
       '@/services': path.resolve(__dirname, './src/services/'),
       '@/test-utils': path.resolve(__dirname, './test-utils/'),
+      '@/styles': path.resolve(__dirname, './src/styles/'),
     }
   },
 })

@@ -12,6 +12,8 @@ import ConfirmationContainer from '@/components/ConfirmationContainer/Confirmati
 import ModalContainer from '@/components/ModalContainer/ModalContainer'
 import ROUTES from '@/constants/routes'
 
+import '@/styles/main.css'
+
 const router = createBrowserRouter(ROUTES)
 
 const queryClient = new QueryClient()

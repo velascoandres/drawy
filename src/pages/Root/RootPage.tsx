@@ -1,8 +1,8 @@
 import {
+  FiInfo,
   FiMenu,
   FiPlus,
-  FiTrash
-} from 'react-icons/fi'
+  FiTrash } from 'react-icons/fi'
 import { Outlet, useNavigate, useParams } from 'react-router-dom'
 
 import { 
@@ -24,7 +24,7 @@ import DrawList, { IDrawListItem } from '@/components/DrawList/DrawList'
 import StatusBar from '@/components/StatusBar/StatusBar'
 import CreateDrawModal from '@/modals/CreateDraw/CreateDrawModal'
 import { useDeleteDrawMutation } from '@/mutations/drawMutations'
-import { useGetDrawsInfoQuery, useGetDrawsQuery } from '@/queries/drawQueries'
+import { useGetDrawsInfoQuery } from '@/queries/drawQueries'
 import useConfirmationStore from '@/store/confirmation/confirmationStore'
 import useModalStore from '@/store/modal/modalStore'
 
@@ -54,7 +54,9 @@ const RootPage = () => {
     })
   }
 
-  const handleDeleteDraw = (draw: IDrawListItem) => () => {
+  const handleDeleteDraw = (draw: IDrawListItem) => (e: React.MouseEvent) => {
+    e.stopPropagation()
+
     openConfirmation({
       title: 'Confirm action',
       content: `Do you want to delete: ${draw.name}?`,
@@ -112,6 +114,19 @@ const RootPage = () => {
             >
               {draw.name}
             </Heading>
+
+            <IconButton 
+              aria-label="delete-draw"
+              size='sm'
+              bg="transparent"
+              icon={<FiInfo />}
+              onClick={handleDeleteDraw(draw)} 
+              _hover={{
+                bg: 'white',
+                color: 'black'
+              }}
+            />
+
             <IconButton 
               aria-label="delete-draw"
               size='sm'

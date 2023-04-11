@@ -22,12 +22,12 @@ const StatusBar = () => {
     <Box 
       position="fixed" 
       bottom={0}
-      bg="white"
+      bg="gray.900"
       width="100%" 
       px={1}
       ml={{ base: 0, md: 60 }}
     >
-      <Text fontSize="sm">{status}</Text>
+      <Text fontSize="sm" color="white">{status}</Text>
     </Box>
   )
 }

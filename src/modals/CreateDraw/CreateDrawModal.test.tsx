@@ -38,8 +38,10 @@ describe('<CreateDrawModal /> tests', () => {
       const { getByLabelText, getByPlaceholderText, getByText } = customRenderModal(<CreateDrawModal />)
     
       expect(getByText('Create a new Draw')).toBeInTheDocument()
-      expect(getByLabelText('Draw name')).toBeInTheDocument()
+      expect(getByLabelText('Name')).toBeInTheDocument()
+      expect(getByLabelText('Description')).toBeInTheDocument()
       expect(getByPlaceholderText('Write a name for your draw')).toBeInTheDocument()
+      expect(getByPlaceholderText('Write a full description for your draw')).toBeInTheDocument()
     })
   })
 
@@ -48,10 +50,12 @@ describe('<CreateDrawModal /> tests', () => {
       const { getByPlaceholderText, getByText } = customRenderModal(<CreateDrawModal />)
       
       await userEvent.type(getByPlaceholderText('Write a name for your draw'), 'Test draw name')
+      await userEvent.type(getByPlaceholderText('Write a full description for your draw'), 'Some description')
       await userEvent.click(getByText('Create'))
       
       expect(createMock).toHaveBeenCalledWith({
-        name: 'Test draw name'
+        name: 'Test draw name',
+        description: 'Some description',
       })
     })
   })
