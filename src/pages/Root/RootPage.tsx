@@ -2,7 +2,8 @@ import {
   FiInfo,
   FiMenu,
   FiPlus,
-  FiTrash } from 'react-icons/fi'
+  FiTrash 
+} from 'react-icons/fi'
 import { Outlet, useNavigate, useParams } from 'react-router-dom'
 
 import { 
@@ -22,9 +23,10 @@ import {
 
 import DrawList, { IDrawListItem } from '@/components/DrawList/DrawList'
 import StatusBar from '@/components/StatusBar/StatusBar'
-import CreateDrawModal from '@/modals/CreateDraw/CreateDrawModal'
+import CreateDrawModal from '@/modals/CreateUpdateDraw/CreateUpdateDrawModal'
 import { useDeleteDrawMutation } from '@/mutations/drawMutations'
 import { useGetDrawsInfoQuery } from '@/queries/drawQueries'
+import { IDrawInfo } from '@/services/drawService'
 import useConfirmationStore from '@/store/confirmation/confirmationStore'
 import useModalStore from '@/store/modal/modalStore'
 
@@ -47,6 +49,21 @@ const RootPage = () => {
   const openCreateDrawModal = () => {
     openModal({
       component: CreateDrawModal,
+      config: {
+        closeOnClickOutside: false,
+        closeOnEscapeKeydown: true,
+      }
+    })
+  }
+
+  const openCrateUpdateDrawModal = (draw: IDrawInfo) => (e: React.MouseEvent) => {
+    e.stopPropagation()
+    
+    openModal({
+      component: CreateDrawModal,
+      props: {
+        draw,
+      },
       config: {
         closeOnClickOutside: false,
         closeOnEscapeKeydown: true,
@@ -116,11 +133,11 @@ const RootPage = () => {
             </Heading>
 
             <IconButton 
-              aria-label="delete-draw"
+              aria-label="info-draw"
               size='sm'
               bg="transparent"
               icon={<FiInfo />}
-              onClick={handleDeleteDraw(draw)} 
+              onClick={openCrateUpdateDrawModal(draw)} 
               _hover={{
                 bg: 'white',
                 color: 'black'

@@ -15,6 +15,7 @@ export interface IRawDraw {
 export interface IDrawInfo {
   id: string
   name: string
+  description?: string
 }
 
 export interface IBackendResponse<T> {

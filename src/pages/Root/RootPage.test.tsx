@@ -4,7 +4,7 @@ import { describe, expect, it, Mock, vi } from 'vitest'
 import userEvent from '@testing-library/user-event'
 
 import ConfirmationContainer from '@/components/ConfirmationContainer/ConfirmationContainer'
-import CreateDrawModal from '@/modals/CreateDraw/CreateDrawModal'
+import CreateDrawModal from '@/modals/CreateUpdateDraw/CreateUpdateDrawModal'
 import { useDeleteDrawMutation } from '@/mutations/drawMutations'
 import { useGetDrawsInfoQuery } from '@/queries/drawQueries'
 import useModalStore from '@/store/modal/modalStore'

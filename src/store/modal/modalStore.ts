@@ -41,7 +41,11 @@ const useModalStore = create<IModalState>()(devtools((setStore) => ({
        
       return {
         ...state,
-        currentModal: payload,
+        currentModal: {
+          component: payload.component,
+          config: payload.config,
+          componentProps: payload.props
+        },
         isOpen: true,
       }
     })

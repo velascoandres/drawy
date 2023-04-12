@@ -6,7 +6,7 @@ import { useCreateDrawMutation } from '@/mutations/drawMutations'
 import * as modalStore from '@/store/modal/modalStore'
 import { customRenderModal } from '@/test-utils/custom-render'
 
-import CreateDrawModal from './CreateDrawModal'
+import CreateDrawModal from './CreateUpdateDrawModal'
 
 
 vi.mock('@/mutations/drawMutations')

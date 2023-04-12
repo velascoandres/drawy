@@ -1,18 +1,17 @@
 import React from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
-import {
-  FiCheck,
-  FiX,
-} from 'react-icons/fi'
+import { FiChevronDown } from 'react-icons/fi'
 import { useParams } from 'react-router-dom'
 
 import { 
   Box,
+  Button,
   Divider, 
   Flex, 
   Heading,
-  IconButton,
-  useDisclosure,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
 } from '@chakra-ui/react'
 import {
   Excalidraw,
@@ -22,7 +21,6 @@ import {
   ExcalidrawImperativeAPI,
 } from '@excalidraw/excalidraw/types/types'
 
-import InputHF from '@/components/InputHF/InputHF'
 import initialData from '@/constants/initial-data'
 import useDebounceCallback from '@/hooks/useDebounceCallback'
 import { useUpdateDrawMutation } from '@/mutations/drawMutations'
@@ -34,15 +32,8 @@ const DrawPage = () => {
   const params = useParams()
   const { data: draw } = useGetDrawByIdQuery(params.drawId as string)
   const { mutate: updateDraw } = useUpdateDrawMutation()
-  const form = useForm<{name: string}>({
-    values: {
-      name: draw?.name || ''
-    }
-  })
 
   const hasLoadedDrawRef = React.useRef<boolean>(false)
-  const { isOpen: isEditingName, onToggle } = useDisclosure()
-
 
   const debounceUpdateScene = useDebounceCallback(UPDATE_SCENE_DEBOUNCE)
 
@@ -55,18 +46,10 @@ const DrawPage = () => {
     setExcalidrawAPI
   ] = React.useState<ExcalidrawImperativeAPI | null>(null)
 
-
-  const handleUpdateName = ({ name }:{name: string}) => {
-    updateDraw({ id: params.drawId as string, name, scene: draw?.scene })
-    onToggle()
-  }
-
-  const resetForm = () => {
-    form.setValue('name', draw?.name as string)
-    onToggle()
-  }
-
   const handleChange = (elements: any[], appState: AppState) => {
+    if (!elements.length) {
+      return
+    }
     if (!draw) {
       return
     }
@@ -92,36 +75,29 @@ const DrawPage = () => {
       excalidrawAPI.scrollToContent()
       hasLoadedDrawRef.current = true
     }
-  }, [draw?.scene])
+  }, [draw?.scene, excalidrawAPI])
 
   React.useEffect(() => {
-    excalidrawAPI?.resetScene()
     hasLoadedDrawRef.current = false
+    // excalidrawAPI?.resetScene()
   }, [params.drawId])
 
   return (
     <Flex align="start" direction="column">
-      <Flex direction="row" justifyContent="start">
-        {
-          isEditingName ? (
-            <form onSubmit={form.handleSubmit(handleUpdateName)}>
-              <FormProvider {...form}>
-                <Flex direction="row" justifyContent="start">
-                  <InputHF 
-                    name="name" 
-                    inputProps={{ placeholder: 'Write a name for your draw' }} 
-                  />
-                  <IconButton aria-label="confirm-update" icon={<FiCheck />} type="submit" />
-                  <IconButton aria-label="cancel-update" icon={<FiX />} onClick={resetForm} />
-                </Flex>
-              </FormProvider>
-            </form>
-          ) : (
-            <Heading as="h3" size="lg" onClick={onToggle} cursor="pointer" >
-              {draw?.name}
-            </Heading>
-          )
-        }
+      <Flex direction="row" justifyContent="start" alignItems="center" gap={2}>
+        <Heading as="h3" size="lg" cursor="pointer" >
+          {draw?.name}
+        </Heading>
+        <Menu>
+          <MenuButton as={Button} rightIcon={<FiChevronDown />}>
+            Export
+          </MenuButton>
+          <MenuList zIndex={9999}>
+            <MenuItem>SVG image</MenuItem>
+            <MenuItem>PNG image</MenuItem>
+            <MenuItem>Raw file</MenuItem>
+          </MenuList>
+        </Menu>
       </Flex>
       <Divider orientation="horizontal" />
       <Box position="relative" width="100%">

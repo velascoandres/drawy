@@ -4,8 +4,9 @@ import { DrawListContext } from './DrawListContext'
 import DrawListItem from './DrawListItem'
 
 export interface IDrawListItem {
-    id: number | string
+    id: string
     name: string
+    description?: string
 }
 
 export interface IDrawListProps {
