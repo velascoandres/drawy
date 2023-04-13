@@ -23,7 +23,7 @@ const TextareaHF = (props: IProps) => {
           <Textarea
             {...field}
             {...textareaProps}
-            value={field.value}
+            value={field.value || ''}
             name={name}
           />
         </FormControl>  

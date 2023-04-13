@@ -19,7 +19,7 @@ import {
 import DrawInfo from '@/components/DrawInfo/DrawInfo'
 import InputHF from '@/components/InputHF/InputHF'
 import TextareaHF from '@/components/TextareaHF/TextareaHF'
-import { useCreateDrawMutation } from '@/mutations/drawMutations'
+import { useCreateDrawMutation, useUpdateDrawMutation } from '@/mutations/drawMutations'
 import { IDrawInfo } from '@/services/drawService'
 import useModalStore from '@/store/modal/modalStore'
 
@@ -38,6 +38,8 @@ const CreateUpdateDrawModal = ({ draw }: IProps) => {
   })
 
   const { mutate: createDraw, isSuccess } = useCreateDrawMutation()
+  const { mutate: updateDraw, isSuccess: isUpdateSuccess } = useUpdateDrawMutation()
+
   const { closeModal } = useModalStore()
 
 
@@ -48,7 +50,15 @@ const CreateUpdateDrawModal = ({ draw }: IProps) => {
   }
 
   const onSubmit = (formValues: IDrawForm) => {
-    createDraw(formValues)
+    if (draw) {
+      updateDraw({
+        id: draw.id,
+        name: formValues.name,
+        description: formValues.description
+      })
+    } else {
+      createDraw(formValues)
+    }
   }
 
   React.useEffect(() => {
@@ -56,6 +66,12 @@ const CreateUpdateDrawModal = ({ draw }: IProps) => {
       closeModal()
     }
   }, [isSuccess])
+
+  React.useEffect(() => {
+    if (isUpdateSuccess) {
+      closeModal()
+    }
+  }, [isUpdateSuccess])
   
   return (
     <ModalContent>

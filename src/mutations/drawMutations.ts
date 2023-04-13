@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient } from 'react-query'
 
 import { IDrawInfoQueryResponse } from '@/queries/drawQueries'
-import drawService, { IDraw } from '@/services/drawService'
+import drawService, { IDraw, IUpdateDraw } from '@/services/drawService'
 
 export const useCreateDrawMutation = () => {
   const queryClient = useQueryClient()
@@ -40,8 +40,10 @@ export const useCreateDrawMutation = () => {
 }
 
 export const useUpdateDrawMutation = () => {  
+  const queryClient = useQueryClient()
+
   return useMutation({
-    mutationFn: async (draw: IDraw) => {
+    mutationFn: async (draw: IUpdateDraw) => {
       const response = await drawService.updateDraw(draw.id, draw)
   
       if (response.error) {
@@ -49,6 +51,51 @@ export const useUpdateDrawMutation = () => {
       }
   
       return response.data
+    },
+    onMutate: async (draw: IUpdateDraw) => {
+      await queryClient.cancelQueries({ queryKey: ['draws_info'] })
+    
+      const previousDraws = queryClient.getQueryData(['draws_info'])
+      const drawById = queryClient.getQueryData(['draw', draw.id])
+
+      if (draw.scene) {
+        return { previousDraws, drawById }
+      }
+    
+      queryClient.setQueryData(['draws_info'], (old: IDrawInfoQueryResponse | undefined) => {
+        const prev = old || { results: [], count: 0 }
+        const index = prev.results.findIndex(prevDraw => prevDraw.id === draw.id)
+
+        const updatedResults = prev.results.splice(index, 1)
+
+        return {
+          count: prev.count - 1,
+          results: updatedResults,
+        }
+      })
+
+      queryClient.setQueryData(['draw', draw.id], (old: unknown) => {
+        const oldDraw = old as IDraw
+
+        if (oldDraw) {
+          return {
+            ...draw,
+            id: oldDraw.id,
+            scene: oldDraw.scene
+          }
+        }
+
+      })
+    
+      return { previousDraws, drawById }
+    },
+    onError: (_err, updatedDraw, context) => {
+      queryClient.setQueryData(['draws_info'], context?.previousDraws)
+      queryClient.setQueryData(['draw', updatedDraw.id], context?.drawById)
+    },
+    onSettled: (_, _e, variables: IUpdateDraw) => {
+      queryClient.invalidateQueries({ queryKey: ['draws_info'] })
+      queryClient.invalidateQueries({ queryKey: ['draw', variables.id] })
     },
   })
 }
