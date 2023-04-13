@@ -1,4 +1,4 @@
-use crate::models::{Draw, DrawInfo};
+use crate::models::{Draw, DrawInfo, UpdateDraw};
 use diesel::prelude::*;
 use diesel::result::Error;
 use uuid::Uuid;
@@ -64,35 +64,13 @@ pub fn find_one_draw_info(conn: &mut SqliteConnection, draw_id: String) -> Resul
 pub fn update_draw(
     conn: &mut SqliteConnection,
     draw_id: String,
-    new_name: String, 
-    new_raw_elements: String
+    body: &UpdateDraw,
 ) -> Result<usize, Error> {
     use crate::schema::draws::dsl::*;
 
     diesel::update(draws.filter(id.eq(draw_id)))
-        .set((
-            name.eq(new_name), 
-            raw_elements.eq(new_raw_elements))
-        )
+        .set(body)
         .execute(conn)
-}
-
-pub fn update_draw_info(
-    conn: &mut SqliteConnection,
-    draw_id: String,
-    updated_name: String, 
-    updated_description: String
-) -> Result<DrawInfo, Error> {
-    use crate::schema::draws::dsl::*;
-
-    diesel::update(draws.filter(id.eq(&draw_id)))
-        .set((
-            name.eq(updated_name), 
-            description.eq(updated_description))
-        )
-        .execute(conn)?;
-
-    find_one_draw_info(conn, draw_id)
 }
 
 pub fn delete_draw(conn: &mut SqliteConnection, draw_id: String) -> Result<usize, Error> {

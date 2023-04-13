@@ -1,7 +1,7 @@
 use diesel::result::Error;
 use serde::Serialize;
 
-use crate::{draws, state::AppState, models::DrawInfo};
+use crate::{draws, state::AppState, models::{DrawInfo, UpdateDraw}};
 
 #[derive(Serialize)]
 struct Response<T> {
@@ -59,9 +59,23 @@ pub fn find_all_draws_command(state: tauri::State<AppState>) -> String {
 }
 
 #[tauri::command]
-pub fn update_draw_command(draw_id: String, name: String, elements_meta: String, state: tauri::State<AppState>) -> String {
+pub fn update_draw_command(
+    draw_id: String, 
+    name: Option<String>,
+    description: Option<String>, 
+    elements_meta: Option<String>, 
+    state: tauri::State<AppState>
+) -> String {
     let conn = &mut *state.conn.lock().unwrap();
-    let result = draws::update_draw(conn, draw_id, name, elements_meta);
+    let result = draws::update_draw(
+        conn, 
+        draw_id, 
+        &UpdateDraw {
+            name,
+            description,
+            raw_elements: elements_meta,
+        }
+    );
 
     let response = match result {
         Ok(_) => Response { data: Some(true), error: None },

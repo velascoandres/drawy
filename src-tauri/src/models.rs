@@ -1,7 +1,7 @@
 #![allow(unused)]
 #![allow(clippy::all)]
 
-use diesel::{Queryable, Insertable, sql_types::Timestamp};
+use diesel::{Queryable, Insertable, sql_types::Timestamp, AsChangeset};
 use serde::{Serialize, Serializer};
 use crate::schema::draws;
 use chrono::{self, DateTime, Utc};
@@ -38,10 +38,10 @@ pub struct DrawInfo {
     pub updated_at: chrono::NaiveDateTime,
 }
 
-#[derive(Insertable)]
-#[table_name = "draws"]
-pub struct NewDraw {
-    pub id: String,
-    pub name: String,
+#[derive(AsChangeset)]
+#[diesel(table_name = draws)]
+pub struct UpdateDraw {
+    pub name: Option<String>,
+    pub description: Option<String>,
     pub raw_elements: Option<String>,
 }
