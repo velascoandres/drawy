@@ -1,15 +1,23 @@
 import { Controller, useFormContext } from 'react-hook-form'
 
-import { FormControl, FormLabel, Textarea, TextareaProps } from '@chakra-ui/react'
+import { 
+  FormControl, 
+  FormErrorMessage, 
+  FormHelperText, 
+  FormLabel, 
+  Textarea, 
+  TextareaProps
+} from '@chakra-ui/react'
 
 interface IProps {
     name: string
     label?: string
     textareaProps: TextareaProps
+    helperText?: string
 }
 
 const TextareaHF = (props: IProps) => {
-  const { name, textareaProps, label } = props
+  const { name, textareaProps, label, helperText } = props
   const { control } = useFormContext()
 
   return (
@@ -26,6 +34,15 @@ const TextareaHF = (props: IProps) => {
             value={field.value || ''}
             name={name}
           />
+          {
+            fieldState.error?.message ? (
+              <FormErrorMessage>{fieldState.error.message}</FormErrorMessage>
+            ) : (
+              <FormHelperText>
+                {helperText}
+              </FormHelperText>
+            )
+          }
         </FormControl>  
       )}
     />

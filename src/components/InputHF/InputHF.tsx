@@ -1,15 +1,16 @@
 import { Controller, useFormContext } from 'react-hook-form'
 
-import { FormControl, FormLabel, Input, InputProps } from '@chakra-ui/react'
+import { FormControl, FormErrorMessage, FormHelperText, FormLabel, Input, InputProps } from '@chakra-ui/react'
 
 interface InputHFProps {
     name: string
     label?: string
     inputProps: InputProps
+    helperText?: string
 }
 
 const InputHF = (props: InputHFProps) => {
-  const { name, inputProps, label } = props
+  const { name, inputProps, label, helperText } = props
   const { control } = useFormContext()
 
   return (
@@ -26,6 +27,15 @@ const InputHF = (props: InputHFProps) => {
             value={field.value}
             name={name}
           />
+          {
+            fieldState.error?.message ? (
+              <FormErrorMessage>{fieldState.error.message}</FormErrorMessage>
+            ) : (
+              <FormHelperText>
+                {helperText}
+              </FormHelperText>
+            )
+          }
         </FormControl>  
       )}
     />

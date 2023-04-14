@@ -4,6 +4,7 @@ import {
   FiEdit,
   FiInfo
 } from 'react-icons/fi'
+import * as yup from 'yup'
 
 import { 
   Button, 
@@ -13,8 +14,10 @@ import {
   ModalCloseButton, 
   ModalContent, 
   ModalFooter, 
-  ModalHeader, 
+  ModalHeader,
+  useToast, 
 } from '@chakra-ui/react'
+import { yupResolver } from '@hookform/resolvers/yup'
 
 import DrawInfo from '@/components/DrawInfo/DrawInfo'
 import InputHF from '@/components/InputHF/InputHF'
@@ -32,9 +35,17 @@ interface IProps {
   draw?: IDrawInfo
 }
 
+const drawInfoSchema = yup.object().shape({
+  name: yup.string().required('This field is required'),
+  description: yup.string().optional(),
+}).required()
+
 const CreateUpdateDrawModal = ({ draw }: IProps) => {
+  const toast = useToast()
+
   const form = useForm<IDrawForm>({
-    defaultValues: draw
+    defaultValues: draw,
+    resolver: yupResolver(drawInfoSchema)
   })
 
   const { mutate: createDraw, isSuccess } = useCreateDrawMutation()
@@ -64,12 +75,26 @@ const CreateUpdateDrawModal = ({ draw }: IProps) => {
   React.useEffect(() => {
     if (isSuccess) {
       closeModal()
+
+      toast({
+        title: 'Draw created',
+        position: 'bottom-right',
+        status: 'success',
+        isClosable: true,
+      })
     }
   }, [isSuccess])
 
   React.useEffect(() => {
     if (isUpdateSuccess) {
       closeModal()
+
+      toast({
+        title: 'Draw info updated',
+        position: 'bottom-right',
+        status: 'success',
+        isClosable: true,
+      })
     }
   }, [isUpdateSuccess])
   
@@ -122,18 +147,24 @@ const CreateUpdateDrawModal = ({ draw }: IProps) => {
                     name="name" 
                     label="Name"
                     inputProps={{ placeholder: 'Write a name for your draw' }} 
+                    helperText="Type a draw name"
                   />
                   <TextareaHF
                     name="description" 
                     label="Description"
                     textareaProps={{ placeholder: 'Write a full description for your draw' }}
+                    helperText="Provide a complete description for the draw"
                   />
                 </Flex>
             
               </FormProvider>
             </ModalBody>
             <ModalFooter gap={2}>
-              <Button variant="solid" colorScheme="messenger" type="submit">
+              <Button 
+                variant="solid" 
+                colorScheme="messenger" 
+                type="submit"
+              >
                 {draw ? 'Update' : 'Create'}
               </Button>
               <Button variant="ghost" onClick={closeModal}>Cancel</Button>
