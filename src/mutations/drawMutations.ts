@@ -66,11 +66,19 @@ export const useUpdateDrawMutation = () => {
         const prev = old || { results: [], count: 0 }
         const index = prev.results.findIndex(prevDraw => prevDraw.id === draw.id)
 
-        const updatedResults = prev.results.splice(index, 1)
+        const oldDraw = prev.results[index]
+
+        const updatedDraw = {
+          ...draw,
+          name: draw.name || oldDraw.name
+        }
+        const draws = [...prev.results]
+
+        draws.splice(index, 1, updatedDraw)
 
         return {
           count: prev.count - 1,
-          results: updatedResults,
+          results: draws,
         }
       })
 
@@ -92,10 +100,6 @@ export const useUpdateDrawMutation = () => {
     onError: (_err, updatedDraw, context) => {
       queryClient.setQueryData(['draws_info'], context?.previousDraws)
       queryClient.setQueryData(['draw', updatedDraw.id], context?.drawById)
-    },
-    onSettled: (_, _e, variables: IUpdateDraw) => {
-      queryClient.invalidateQueries({ queryKey: ['draws_info'] })
-      queryClient.invalidateQueries({ queryKey: ['draw', variables.id] })
     },
   })
 }
@@ -122,11 +126,13 @@ export const useDeleteDrawMutation = () => {
         const prev = old || { results: [], count: 0 }
         const index = prev.results.findIndex(prevDraw => prevDraw.id === drawId)
 
-        const updatedResults = prev.results.splice(index, 1)
+        const draws = [...prev.results]
+
+        draws.splice(index, 1)
 
         return {
           count: prev.count - 1,
-          results: updatedResults,
+          results: draws,
         }
       })
     
@@ -134,9 +140,6 @@ export const useDeleteDrawMutation = () => {
     },
     onError: (_err, _newDraw, context) => {
       queryClient.setQueryData(['draws_info'], context?.previousDraws)
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['draws_info'] })
     },
   })
 }

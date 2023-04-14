@@ -18,6 +18,8 @@ import {
 } from '@excalidraw/excalidraw'
 import {
   AppState,
+  BinaryFileData,
+  BinaryFiles,
   ExcalidrawImperativeAPI,
 } from '@excalidraw/excalidraw/types/types'
 
@@ -46,14 +48,16 @@ const DrawPage = () => {
     setExcalidrawAPI
   ] = React.useState<ExcalidrawImperativeAPI | null>(null)
 
-  const handleChange = (elements: any[], appState: AppState) => {
+  // eslint-disable-next-line max-params
+  const handleChange = (elements: any[], appState: AppState, files?: BinaryFiles) => {
     if (!elements.length) {
       return
     }
     if (!draw) {
       return
     }
-    updateDraw({
+
+    const payload = {
       id: draw.id,
       name: draw.name,
       scene: { 
@@ -61,20 +65,32 @@ const DrawPage = () => {
         appState: {
           viewBackgroundColor: appState.viewBackgroundColor,
           currentItemFontFamily: appState.currentItemFontFamily,
-          currentItemFontSize: appState.currentItemFontSize
+          currentItemFontSize: appState.currentItemFontSize,
         }, 
         scrollToContent: true, 
-        libraryItems: initialData.libraryItems
-      } 
-    })
+        libraryItems: initialData.libraryItems,
+        files: Object.values(files || {}),
+      },
+    }
+
+    updateDraw(payload)
   }
 
   React.useEffect(() => {
-    if (draw?.scene && !hasLoadedDrawRef.current && excalidrawAPI) {
-      excalidrawAPI.updateScene(draw.scene)
-      excalidrawAPI.scrollToContent()
-      hasLoadedDrawRef.current = true
+    if (!(draw?.scene && !hasLoadedDrawRef.current && excalidrawAPI)) {
+      return
     }
+
+    const files = draw.scene.files as BinaryFileData[] 
+
+    if (files.length) {
+      excalidrawAPI.addFiles(draw.scene.files as BinaryFileData[])
+    }
+
+    excalidrawAPI.updateScene(draw.scene)
+    excalidrawAPI.scrollToContent()
+    hasLoadedDrawRef.current = true
+  
   }, [draw?.scene, excalidrawAPI])
 
   React.useEffect(() => {
@@ -89,7 +105,7 @@ const DrawPage = () => {
           {draw?.name}
         </Heading>
         <Menu>
-          <MenuButton as={Button} rightIcon={<FiChevronDown />}>
+          <MenuButton as={Button} rightIcon={<FiChevronDown />} disabled>
             Export
           </MenuButton>
           <MenuList zIndex={9999}>
@@ -104,8 +120,9 @@ const DrawPage = () => {
         <Box height="-webkit-fill-available" width="100%" position="absolute" paddingY={4}>
           <Excalidraw
             ref={(api: ExcalidrawImperativeAPI) => setExcalidrawAPI(api)}
-            onChange={(elements, appState) => {
-              debounceUpdateScene(() => handleChange([...elements], appState))
+            // eslint-disable-next-line max-params
+            onChange={(elements, appState, files) => {
+              debounceUpdateScene(() => handleChange([...elements], appState, files))
             }}
             viewModeEnabled={viewModeEnabled}
             gridModeEnabled={gridModeEnabled}
