@@ -1,8 +1,9 @@
 import {
   FiInfo,
   FiMenu,
+  FiMoreVertical, 
   FiPlus,
-  FiTrash 
+  FiTrash,
 } from 'react-icons/fi'
 import { Outlet, useNavigate, useParams } from 'react-router-dom'
 
@@ -16,6 +17,10 @@ import {
   Flex,
   Heading,
   IconButton,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Text,
   useColorModeValue,
   useDisclosure,
@@ -23,7 +28,7 @@ import {
 
 import DrawList, { IDrawListItem } from '@/components/DrawList/DrawList'
 import StatusBar from '@/components/StatusBar/StatusBar'
-import CreateDrawModal from '@/modals/CreateUpdateDraw/CreateUpdateDrawModal'
+import CreateUpdateDrawModal from '@/modals/CreateUpdateDraw/CreateUpdateDrawModal'
 import { useDeleteDrawMutation } from '@/mutations/drawMutations'
 import { useGetDrawsInfoQuery } from '@/queries/drawQueries'
 import { IDrawInfo } from '@/services/drawService'
@@ -48,7 +53,7 @@ const RootPage = () => {
 
   const openCreateDrawModal = () => {
     openModal({
-      component: CreateDrawModal,
+      component: CreateUpdateDrawModal,
       config: {
         closeOnClickOutside: false,
         closeOnEscapeKeydown: true,
@@ -60,7 +65,7 @@ const RootPage = () => {
     e.stopPropagation()
     
     openModal({
-      component: CreateDrawModal,
+      component: CreateUpdateDrawModal,
       props: {
         draw,
       },
@@ -91,6 +96,7 @@ const RootPage = () => {
       pos="fixed"
       h="full"
       {...props}
+      zIndex={9999}
     >
       <Flex h="20" alignItems="center" mx="8" justifyContent="center">
         <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
@@ -132,29 +138,35 @@ const RootPage = () => {
               {draw.name}
             </Heading>
 
-            <IconButton 
-              aria-label="info-draw"
-              size='sm'
-              bg="transparent"
-              icon={<FiInfo />}
-              onClick={openCrateUpdateDrawModal(draw)} 
-              _hover={{
-                bg: 'white',
-                color: 'black'
-              }}
-            />
-
-            <IconButton 
-              aria-label="delete-draw"
-              size='sm'
-              bg="transparent"
-              icon={<FiTrash />}
-              onClick={handleDeleteDraw(draw)} 
-              _hover={{
-                bg: 'white',
-                color: 'black'
-              }}
-            />
+            <Menu>
+              <MenuButton
+                as={IconButton}
+                aria-label="options"
+                bg="transparent"
+                _hover={{ bg: 'transparent' }}
+                _expanded={{ bg: 'transparent' }}
+                icon={<FiMoreVertical />}
+                onClick={(e) => e.stopPropagation()}
+              />
+              <MenuList zIndex={9999}>
+                <MenuItem 
+                  color="black"
+                  aria-label="info"
+                  icon={<FiInfo />} 
+                  onClick={openCrateUpdateDrawModal(draw)}
+                >
+                  Information
+                </MenuItem>
+                <MenuItem 
+                  color="black"
+                  aria-label="remove"
+                  icon={<FiTrash />} 
+                  onClick={handleDeleteDraw(draw)}
+                >
+                  Remove
+                </MenuItem>
+              </MenuList>
+            </Menu>
           </Flex>
         )}
       </DrawList>
