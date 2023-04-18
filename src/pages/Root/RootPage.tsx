@@ -1,9 +1,10 @@
 import {
+  FiDownload,
   FiInfo,
   FiMenu,
   FiMoreVertical, 
   FiPlus,
-  FiTrash,
+  FiTrash 
 } from 'react-icons/fi'
 import { Outlet, useNavigate, useParams } from 'react-router-dom'
 
@@ -29,6 +30,7 @@ import {
 import DrawList, { IDrawListItem } from '@/components/DrawList/DrawList'
 import StatusBar from '@/components/StatusBar/StatusBar'
 import CreateUpdateDrawModal from '@/modals/CreateUpdateDraw/CreateUpdateDrawModal'
+import ExportFile from '@/modals/ExportFile/ExportFile'
 import { useDeleteDrawMutation } from '@/mutations/drawMutations'
 import { useGetDrawsInfoQuery } from '@/queries/drawQueries'
 import { IDrawInfo } from '@/services/drawService'
@@ -36,6 +38,7 @@ import useConfirmationStore from '@/store/confirmation/confirmationStore'
 import useModalStore from '@/store/modal/modalStore'
 
 
+// eslint-disable-next-line max-lines-per-function
 const RootPage = () => {
   const { isOpen, onClose, onOpen } = useDisclosure()
   const navigate = useNavigate()
@@ -86,6 +89,17 @@ const RootPage = () => {
     })
   }
 
+  const openExportModal = (draw: IDrawListItem) => (e: React.MouseEvent) => {
+    e.stopPropagation()
+
+    openModal({
+      component: ExportFile,
+      props: {
+        drawId: draw.id,
+      },
+    })
+  }
+
 
   const renderSideContent = (props: BoxProps = {}) => (
     <Box
@@ -96,7 +110,7 @@ const RootPage = () => {
       pos="fixed"
       h="full"
       {...props}
-      zIndex={9999}
+      zIndex={999}
     >
       <Flex h="20" alignItems="center" mx="8" justifyContent="center">
         <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
@@ -121,7 +135,7 @@ const RootPage = () => {
         onSelectDraw={navigateToDrawPage}
       > 
 
-        {(draw) => (
+        {(draw, isSelected) => (
           <Flex 
             direction="row" 
             gap={2} 
@@ -143,8 +157,8 @@ const RootPage = () => {
                 as={IconButton}
                 aria-label="options"
                 bg="transparent"
-                _hover={{ bg: 'transparent' }}
-                _expanded={{ bg: 'transparent' }}
+                _hover={{ bg: 'tranparent', borderWidth: '1px', borderColor: isSelected ? 'white' : 'black' }}
+                _expanded={{ bg: 'transparent', borderWidth: '1px', borderColor: isSelected ? 'white' : 'black' }}
                 icon={<FiMoreVertical />}
                 onClick={(e) => e.stopPropagation()}
               />
@@ -156,6 +170,14 @@ const RootPage = () => {
                   onClick={openCrateUpdateDrawModal(draw)}
                 >
                   Information
+                </MenuItem>
+                <MenuItem 
+                  color="black"
+                  aria-label="download"
+                  icon={<FiDownload />} 
+                  onClick={openExportModal(draw)}
+                >
+                  Export
                 </MenuItem>
                 <MenuItem 
                   color="black"
