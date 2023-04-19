@@ -59,7 +59,8 @@ module.exports = {
     'comma-spacing': ['error', { before: false, after: true }],
     'brace-style': 'error',
     'no-multi-spaces': 'error',
-    'react/react-in-jsx-scope': 'off'
+    'react/react-in-jsx-scope': 'off',
+    'react-hooks/exhaustive-deps': 'warn'
   },
   overrides: [
     {

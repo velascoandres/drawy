@@ -70,6 +70,7 @@ const DrawPage = () => {
         scrollToContent: true, 
         libraryItems: initialData.libraryItems,
         files: Object.values(files || {}),
+        rawFiles: files,
       },
     }
 

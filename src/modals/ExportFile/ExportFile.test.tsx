@@ -1,5 +1,7 @@
 import { describe, it, Mock, vi } from 'vitest'
 
+import { exportToBlob } from '@excalidraw/excalidraw'
+
 import initialData from '@/constants/initial-data'
 import { useGetDrawByIdQuery } from '@/queries/drawQueries'
 import { IDraw } from '@/services/drawService'
@@ -14,13 +16,19 @@ const testDraw: IDraw = {
 }
 
 vi.mock('@/queries/drawQueries')
+vi.mock('@excalidraw/excalidraw')
+vi.mock('@excalidraw/excalidraw/types/element/types')
+vi.mock('@excalidraw/excalidraw/types/types')
 
 const getDrawByIdQueryMock = useGetDrawByIdQuery as Mock
 
 
+const exportToBlobMock = exportToBlob as Mock
+
 describe('<ExportFile /> tests', () => { 
-  beforeAll(() => {
+  beforeEach(() => {
     getDrawByIdQueryMock.mockReturnValue({ data: testDraw })
+    exportToBlobMock.mockResolvedValue(new File([], 'test'))
   })
 
   it('should render', () => {
