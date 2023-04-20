@@ -1,5 +1,5 @@
 import React from 'react'
-import { FiChevronDown } from 'react-icons/fi'
+import { FiDownload } from 'react-icons/fi'
 import { useParams } from 'react-router-dom'
 
 import { 
@@ -8,10 +8,6 @@ import {
   Divider, 
   Flex, 
   Heading,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
 } from '@chakra-ui/react'
 import {
   Excalidraw,
@@ -25,8 +21,10 @@ import {
 
 import initialData from '@/constants/initial-data'
 import useDebounceCallback from '@/hooks/useDebounceCallback'
+import ExportFile from '@/modals/ExportFile/ExportFile'
 import { useUpdateDrawMutation } from '@/mutations/drawMutations'
 import { useGetDrawByIdQuery } from '@/queries/drawQueries'
+import useModalStore from '@/store/modal/modalStore'
 
 const UPDATE_SCENE_DEBOUNCE = 1000
 
@@ -34,6 +32,8 @@ const DrawPage = () => {
   const params = useParams()
   const { data: draw } = useGetDrawByIdQuery(params.drawId as string)
   const { mutate: updateDraw } = useUpdateDrawMutation()
+
+  const { openModal } = useModalStore()
 
   const hasLoadedDrawRef = React.useRef<boolean>(false)
 
@@ -48,7 +48,7 @@ const DrawPage = () => {
     setExcalidrawAPI
   ] = React.useState<ExcalidrawImperativeAPI | null>(null)
 
-  // eslint-disable-next-line max-params
+  // eslint-disable-next-line max-params, @typescript-eslint/no-explicit-any
   const handleChange = (elements: any[], appState: AppState, files?: BinaryFiles) => {
     if (!elements.length) {
       return
@@ -75,6 +75,19 @@ const DrawPage = () => {
     }
 
     updateDraw(payload)
+  }
+
+  const openExportModal = () => {
+    if (!draw) {
+      return
+    }
+
+    openModal({
+      component: ExportFile,
+      props: {
+        drawId: draw.id,
+      },
+    })
   }
 
   React.useEffect(() => {
@@ -105,16 +118,10 @@ const DrawPage = () => {
         <Heading as="h3" size="lg" cursor="pointer" >
           {draw?.name}
         </Heading>
-        <Menu>
-          <MenuButton as={Button} rightIcon={<FiChevronDown />} disabled>
+        
+        <Button leftIcon={<FiDownload />} onClick={openExportModal}>
             Export
-          </MenuButton>
-          <MenuList zIndex={9999}>
-            <MenuItem>SVG image</MenuItem>
-            <MenuItem>PNG image</MenuItem>
-            <MenuItem>Raw file</MenuItem>
-          </MenuList>
-        </Menu>
+        </Button>
       </Flex>
       <Divider orientation="horizontal" />
       <Box position="relative" width="100%">

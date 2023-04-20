@@ -101,7 +101,7 @@ describe('<RootPage /> tests', () => {
 
   describe('When click on "Information" draw button', () => { 
     it('should open the modal', async () => {
-      const { getAllByLabelText, getByText } = customRender(<RootPage />)
+      const { getAllByLabelText } = customRender(<RootPage />)
       
       await userEvent.click(getAllByLabelText('options')[0])
 

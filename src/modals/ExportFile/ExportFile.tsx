@@ -12,11 +12,15 @@ import {
   ModalFooter, 
   ModalHeader, 
   Radio, 
+  useToast, 
   VStack 
 } from '@chakra-ui/react'
-import { exportToBlob } from '@excalidraw/excalidraw'
+import { exportToBlob, exportToSvg } from '@excalidraw/excalidraw'
 import type { ExcalidrawElement } from '@excalidraw/excalidraw/types/element/types'
 import type { BinaryFiles } from '@excalidraw/excalidraw/types/types'
+import { save } from '@tauri-apps/api/dialog'
+import { writeBinaryFile } from '@tauri-apps/api/fs'
+import { downloadDir } from '@tauri-apps/api/path'
 
 import RadioGroupHF from '@/components/RadioGroupHF/RadioGroupHF'
 import SwitchHF from '@/components/SwitchHF/SwitchHF'
@@ -24,11 +28,8 @@ import { useGetDrawByIdQuery } from '@/queries/drawQueries'
 import { IDraw } from '@/services/drawService'
 import useModalStore from '@/store/modal/modalStore'
 
-enum ExportTarget {
-    PNG = 'png',
-    SVG = 'svg',
-    JSON = 'json'
-}
+
+type ExportTarget = 'png' | 'svg' | 'json'
 
 interface IProps {
     drawId: string
@@ -47,10 +48,125 @@ const ExportFile = (props: IProps) => {
 
   const { data: draw } = useGetDrawByIdQuery(drawId)  
   const { closeModal } = useModalStore()
+  const toast = useToast()
 
   const form = useForm<IExportForm>()
 
-  const handleExport = (config: IExportForm) => console.log(config)
+  const getSvgFile = (config: IExportForm) => {
+    const elements = draw?.scene?.elements as ExcalidrawElement[] | null
+    const files = draw?.scene?.rawFiles as BinaryFiles | null
+
+    return exportToSvg({
+      elements: elements || [],
+      appState: {
+        ...(draw?.scene?.appState || {}),
+        theme: config.withDarkTheme ? 'dark' : 'light',
+        exportWithDarkMode: config.withDarkTheme,
+        exportBackground: config.withBackground,
+        exportEmbedScene: config.withEmbebScene,
+        exportScale: 1
+      },
+      files
+    })
+  }
+
+  const getPngFile = (config: IExportForm) => {
+    const elements = draw?.scene?.elements as ExcalidrawElement[] | null
+    const files = draw?.scene?.rawFiles as BinaryFiles | null
+
+    return exportToBlob({
+      elements: elements || [],
+      mimeType: 'image/png',
+      appState: {
+        ...(draw?.scene?.appState || {}),
+        theme: config.withDarkTheme ? 'dark' : 'light',
+        exportWithDarkMode: config.withDarkTheme,
+        exportBackground: config.withBackground,
+        exportEmbedScene: config.withEmbebScene,
+        exportScale: 1
+      },
+      files
+    })
+  }
+
+  const getJSONBlobFile = (config: IExportForm) => {
+    const elements = draw?.scene?.elements as ExcalidrawElement[] | null
+    const files = draw?.scene?.rawFiles as BinaryFiles | null
+
+
+    const str = JSON.stringify({
+      elements: elements || [],
+      mimeType: 'image/png',
+      appState: {
+        ...(draw?.scene?.appState || {}),
+        theme: config.withDarkTheme ? 'dark' : 'light',
+      },
+      files
+    })
+    const bytes = new TextEncoder().encode(str)
+
+    const blob = new Blob([bytes], {
+      type: 'application/json;charset=utf-8'
+    })
+    
+    return Promise.resolve(blob)
+  }
+
+  const handleExport = async (config: IExportForm) => {
+    if (!draw) {
+      return
+    }
+
+    try {
+      const saveHandlers: Record<ExportTarget, (config: IExportForm) => Promise<SVGElement | Blob>> = {
+        svg: getSvgFile,
+        png: getPngFile,
+        json: getJSONBlobFile,
+      }
+
+      const getFileHandler = saveHandlers[config.target]
+
+      const file = await getFileHandler(config)
+      const downloadsPath = await downloadDir()
+
+      const path = await save({
+        defaultPath: `${downloadsPath}/${draw.name.replace(' ', '-')}.${config.target}`,
+      })
+
+
+      if (!path) {
+        return
+      }
+
+      let fileBlob
+
+      if (config.target === 'svg') {
+        const svgFile = file as SVGElement
+
+        fileBlob = new Blob([svgFile.outerHTML], { type: 'image/svg+xml' })
+      } else {
+        fileBlob = file as Blob
+      }
+
+      const buffer = await fileBlob.arrayBuffer()
+
+      await writeBinaryFile(path, buffer)
+
+      toast({
+        status: 'success',
+        title: 'Draw exported',
+        position: 'bottom-right',
+      })
+
+      closeModal()
+    } catch (e) {
+      toast({
+        status: 'error',
+        title: 'Export to file error',
+        position: 'bottom-right',
+      })
+    }
+  }
 
   return (
     <ModalContent>
@@ -71,10 +187,10 @@ const ExportFile = (props: IProps) => {
                   <Heading as='h5' size="md">
                     Select the target:
                   </Heading>
-                  <RadioGroupHF name="target" value={ExportTarget.SVG}>
-                    <Radio value={ExportTarget.SVG}>SVG</Radio>
-                    <Radio value={ExportTarget.PNG}>PNG</Radio>
-                    <Radio value={ExportTarget.JSON}>JSON</Radio>
+                  <RadioGroupHF name="target" value="svg">
+                    <Radio value="svg">SVG</Radio>
+                    <Radio value="png">PNG</Radio>
+                    <Radio value="json">JSON</Radio>
                   </RadioGroupHF>
                 </Flex>
 
@@ -82,7 +198,6 @@ const ExportFile = (props: IProps) => {
                   <Heading as='h5' size="md">
                     Options:
                   </Heading>
-                  <SwitchHF label="Export with dark mode:" name="withDarkTheme" value={false} />
                   <SwitchHF label="Export with embed scene:" name="withEmbebScene" value={false} />
                   <SwitchHF label="Mantain background:" name="withBackground" value={false} />  
                 </Flex>
