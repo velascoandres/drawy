@@ -1,11 +1,12 @@
+import { useIsFetching, useIsMutating } from 'react-query'
 import { describe, expect, it, Mock, vi } from 'vitest'
 
 import userEvent from '@testing-library/user-event'
 
 import ConfirmationContainer from '@/components/ConfirmationContainer/ConfirmationContainer'
-import CreateDrawModal from '@/modals/CreateDraw/CreateDrawModal'
+import CreateUpdateDrawModal from '@/modals/CreateUpdateDraw/CreateUpdateDrawModal'
 import { useDeleteDrawMutation } from '@/mutations/drawMutations'
-import { useGetDrawsQuery } from '@/queries/drawQueries'
+import { useGetDrawsInfoQuery } from '@/queries/drawQueries'
 import useModalStore from '@/store/modal/modalStore'
 import { customRender } from '@/test-utils/custom-render'
 
@@ -22,6 +23,7 @@ vi.mock('react-router-dom', () => ({
 
 vi.mock('@/queries/drawQueries')
 vi.mock('@/mutations/drawMutations')
+vi.mock('react-query')
 
 const items = [
   { id: '1', name: 'draw 1' }, 
@@ -30,14 +32,18 @@ const items = [
 
 const deleteMock = vi.fn()
 
-const useGetDrawsQueryMock = useGetDrawsQuery as Mock
+const useGetDrawsInfoQueryMock = useGetDrawsInfoQuery as Mock
 const useDeleteDrawMutationMock = useDeleteDrawMutation as Mock
+const isFetchingMock = useIsFetching as Mock
+const isMutatingMock = useIsMutating as Mock
 
-describe('<DrawList /> tests', () => {
+describe('<RootPage /> tests', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    useGetDrawsQueryMock.mockReturnValue({ data: items })
+    useGetDrawsInfoQueryMock.mockReturnValue({ data: { results: items, count: items.length } })
     useDeleteDrawMutationMock.mockReturnValue({ mutate: deleteMock })
+    isFetchingMock.mockReturnValue(0)
+    isMutatingMock.mockReturnValue(0)
   })
 
   describe('When renders', () => {
@@ -68,11 +74,11 @@ describe('<DrawList /> tests', () => {
       await userEvent.click(getByText('Add draw'))
 
       expect(useModalStore.getState().isOpen).toBeTruthy()
-      expect(useModalStore.getState().currentModal?.component).toStrictEqual(CreateDrawModal)
+      expect(useModalStore.getState().currentModal?.component).toStrictEqual(CreateUpdateDrawModal)
     })
   })
 
-  describe('When click on Delete draw button', () => { 
+  describe('When click on "Delete" draw button', () => { 
     it('should call delete mutation', async () => {
       const { getAllByLabelText, getByText } = customRender(
         <>
@@ -81,13 +87,28 @@ describe('<DrawList /> tests', () => {
         </>
       )
       
-      await userEvent.click(getAllByLabelText('delete-draw')[0])
+      await userEvent.click(getAllByLabelText('options')[0])
+
+      await userEvent.click(getAllByLabelText('remove')[0])
 
       expect(getByText('Do you want to delete: draw 1?')).toBeInTheDocument()
 
       await userEvent.click(getByText('Confirm'))
       
       expect(deleteMock).toHaveBeenCalledWith('1')
+    })
+  })
+
+  describe('When click on "Information" draw button', () => { 
+    it('should open the modal', async () => {
+      const { getAllByLabelText } = customRender(<RootPage />)
+      
+      await userEvent.click(getAllByLabelText('options')[0])
+
+      await userEvent.click(getAllByLabelText('info')[0])
+
+      expect(useModalStore.getState().isOpen).toBeTruthy()
+      expect(useModalStore.getState().currentModal?.component).toStrictEqual(CreateUpdateDrawModal)
     })
   })
 })

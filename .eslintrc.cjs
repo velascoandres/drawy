@@ -36,7 +36,7 @@ module.exports = {
     'array-element-newline': 0,
     'max-statements': ['error', 30],
     'max-len': ['error', 130],
-    'max-lines-per-function': ['error', 170],
+    'max-lines-per-function': ['error', 200],
     'max-params': ['error', 2],
     'newline-after-var': 2,
     'newline-before-return': 2,
@@ -59,7 +59,8 @@ module.exports = {
     'comma-spacing': ['error', { before: false, after: true }],
     'brace-style': 'error',
     'no-multi-spaces': 'error',
-    'react/react-in-jsx-scope': 'off'
+    'react/react-in-jsx-scope': 'off',
+    'react-hooks/exhaustive-deps': 'warn'
   },
   overrides: [
     {

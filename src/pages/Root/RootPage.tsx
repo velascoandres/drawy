@@ -1,7 +1,10 @@
 import {
+  FiDownload,
+  FiInfo,
   FiMenu,
+  FiMoreVertical, 
   FiPlus,
-  FiTrash
+  FiTrash 
 } from 'react-icons/fi'
 import { Outlet, useNavigate, useParams } from 'react-router-dom'
 
@@ -15,19 +18,27 @@ import {
   Flex,
   Heading,
   IconButton,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Text,
   useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react'
 
 import DrawList, { IDrawListItem } from '@/components/DrawList/DrawList'
-import CreateDrawModal from '@/modals/CreateDraw/CreateDrawModal'
+import StatusBar from '@/components/StatusBar/StatusBar'
+import CreateUpdateDrawModal from '@/modals/CreateUpdateDraw/CreateUpdateDrawModal'
+import ExportFile from '@/modals/ExportFile/ExportFile'
 import { useDeleteDrawMutation } from '@/mutations/drawMutations'
-import { useGetDrawsQuery } from '@/queries/drawQueries'
+import { useGetDrawsInfoQuery } from '@/queries/drawQueries'
+import { IDrawInfo } from '@/services/drawService'
 import useConfirmationStore from '@/store/confirmation/confirmationStore'
 import useModalStore from '@/store/modal/modalStore'
 
 
+// eslint-disable-next-line max-lines-per-function
 const RootPage = () => {
   const { isOpen, onClose, onOpen } = useDisclosure()
   const navigate = useNavigate()
@@ -37,7 +48,7 @@ const RootPage = () => {
   const { openConfirmation } = useConfirmationStore()
   const { mutate: deleteDraw } = useDeleteDrawMutation()
 
-  const { data: draws = [] } = useGetDrawsQuery()
+  const { data: response } = useGetDrawsInfoQuery()
 
   const navigateToDrawPage = (item: IDrawListItem) => {
     navigate(`/draw/${item.id}`)
@@ -45,7 +56,7 @@ const RootPage = () => {
 
   const openCreateDrawModal = () => {
     openModal({
-      component: CreateDrawModal,
+      component: CreateUpdateDrawModal,
       config: {
         closeOnClickOutside: false,
         closeOnEscapeKeydown: true,
@@ -53,11 +64,39 @@ const RootPage = () => {
     })
   }
 
-  const handleDeleteDraw = (draw: IDrawListItem) => () => {
+  const openCrateUpdateDrawModal = (draw: IDrawInfo) => (e: React.MouseEvent) => {
+    e.stopPropagation()
+    
+    openModal({
+      component: CreateUpdateDrawModal,
+      props: {
+        draw,
+      },
+      config: {
+        closeOnClickOutside: false,
+        closeOnEscapeKeydown: true,
+      }
+    })
+  }
+
+  const handleDeleteDraw = (draw: IDrawListItem) => (e: React.MouseEvent) => {
+    e.stopPropagation()
+
     openConfirmation({
       title: 'Confirm action',
       content: `Do you want to delete: ${draw.name}?`,
       onConfirm: () => deleteDraw(draw.id.toString())
+    })
+  }
+
+  const openExportModal = (draw: IDrawListItem) => (e: React.MouseEvent) => {
+    e.stopPropagation()
+
+    openModal({
+      component: ExportFile,
+      props: {
+        drawId: draw.id,
+      },
     })
   }
 
@@ -71,6 +110,7 @@ const RootPage = () => {
       pos="fixed"
       h="full"
       {...props}
+      zIndex={999}
     >
       <Flex h="20" alignItems="center" mx="8" justifyContent="center">
         <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
@@ -90,12 +130,12 @@ const RootPage = () => {
         </Button>
       </Flex>
       <DrawList 
-        items={draws} 
+        items={response?.results || []} 
         selectedValue={params.drawId}
         onSelectDraw={navigateToDrawPage}
       > 
 
-        {(draw) => (
+        {(draw, isSelected) => (
           <Flex 
             direction="row" 
             gap={2} 
@@ -111,17 +151,44 @@ const RootPage = () => {
             >
               {draw.name}
             </Heading>
-            <IconButton 
-              aria-label="delete-draw"
-              size='sm'
-              bg="transparent"
-              icon={<FiTrash />}
-              onClick={handleDeleteDraw(draw)} 
-              _hover={{
-                bg: 'white',
-                color: 'black'
-              }}
-            />
+
+            <Menu>
+              <MenuButton
+                as={IconButton}
+                aria-label="options"
+                bg="transparent"
+                _hover={{ bg: 'tranparent', borderWidth: '1px', borderColor: isSelected ? 'white' : 'black' }}
+                _expanded={{ bg: 'transparent', borderWidth: '1px', borderColor: isSelected ? 'white' : 'black' }}
+                icon={<FiMoreVertical />}
+                onClick={(e) => e.stopPropagation()}
+              />
+              <MenuList zIndex={9999}>
+                <MenuItem 
+                  color="black"
+                  aria-label="info"
+                  icon={<FiInfo />} 
+                  onClick={openCrateUpdateDrawModal(draw)}
+                >
+                  Information
+                </MenuItem>
+                <MenuItem 
+                  color="black"
+                  aria-label="download"
+                  icon={<FiDownload />} 
+                  onClick={openExportModal(draw)}
+                >
+                  Export
+                </MenuItem>
+                <MenuItem 
+                  color="black"
+                  aria-label="remove"
+                  icon={<FiTrash />} 
+                  onClick={handleDeleteDraw(draw)}
+                >
+                  Remove
+                </MenuItem>
+              </MenuList>
+            </Menu>
           </Flex>
         )}
       </DrawList>
@@ -168,6 +235,7 @@ const RootPage = () => {
       <Box ml={{ base: 0, md: 60 }} p="4">
         <Outlet />
       </Box>
+      <StatusBar />
     </Box>
   )
 }

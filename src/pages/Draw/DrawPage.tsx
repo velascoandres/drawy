@@ -1,115 +1,136 @@
 import React from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
-import {
-  FiCheck,
-  FiX,
-} from 'react-icons/fi'
+import { FiDownload } from 'react-icons/fi'
 import { useParams } from 'react-router-dom'
 
 import { 
   Box,
+  Button,
   Divider, 
   Flex, 
   Heading,
-  IconButton,
-  useDisclosure,
 } from '@chakra-ui/react'
 import {
   Excalidraw,
 } from '@excalidraw/excalidraw'
 import {
   AppState,
+  BinaryFileData,
+  BinaryFiles,
   ExcalidrawImperativeAPI,
 } from '@excalidraw/excalidraw/types/types'
 
-import InputHF from '@/components/InputHF/InputHF'
+import initialData from '@/constants/initial-data'
+import useDebounceCallback from '@/hooks/useDebounceCallback'
+import ExportFile from '@/modals/ExportFile/ExportFile'
 import { useUpdateDrawMutation } from '@/mutations/drawMutations'
 import { useGetDrawByIdQuery } from '@/queries/drawQueries'
+import useModalStore from '@/store/modal/modalStore'
+
+const UPDATE_SCENE_DEBOUNCE = 1000
 
 const DrawPage = () => {
   const params = useParams()
   const { data: draw } = useGetDrawByIdQuery(params.drawId as string)
-  const { mutate: updateDraw, isSuccess } = useUpdateDrawMutation()
-  const form = useForm<{name: string}>({
-    values: {
-      name: draw?.name || ''
-    }
-  })
+  const { mutate: updateDraw } = useUpdateDrawMutation()
 
-  const { isOpen: isEditingName, onToggle } = useDisclosure()
+  const { openModal } = useModalStore()
 
-  const [viewModeEnabled, setViewModeEnabled] = React.useState(false)
-  const [gridModeEnabled, setGridModeEnabled] = React.useState(false)
-  const [theme, setTheme] = React.useState('dark')
+  const hasLoadedDrawRef = React.useRef<boolean>(false)
+
+  const debounceUpdateScene = useDebounceCallback(UPDATE_SCENE_DEBOUNCE)
+
+  const [viewModeEnabled] = React.useState(false)
+  const [gridModeEnabled] = React.useState(false)
+  const [theme] = React.useState('light')
 
   const [
     excalidrawAPI,
     setExcalidrawAPI
   ] = React.useState<ExcalidrawImperativeAPI | null>(null)
 
-
-  const handleUpdateName = ({ name }:{name: string}) => {
-    updateDraw({ id: params.drawId as string, name, scene: draw?.scene })
-    onToggle()
-  }
-
-  const resetForm = () => {
-    form.setValue('name', draw?.name as string)
-    onToggle()
-  }
-
-  const handleChange = (elements: any[], appState: AppState) => {
+  // eslint-disable-next-line max-params, @typescript-eslint/no-explicit-any
+  const handleChange = (elements: any[], appState: AppState, files?: BinaryFiles) => {
+    if (!elements.length) {
+      return
+    }
     if (!draw) {
       return
     }
-    updateDraw({
+
+    const payload = {
       id: draw.id,
       name: draw.name,
-      scene: { elements, appState } 
+      scene: { 
+        elements, 
+        appState: {
+          viewBackgroundColor: appState.viewBackgroundColor,
+          currentItemFontFamily: appState.currentItemFontFamily,
+          currentItemFontSize: appState.currentItemFontSize,
+        }, 
+        scrollToContent: true, 
+        libraryItems: initialData.libraryItems,
+        files: Object.values(files || {}),
+        rawFiles: files,
+      },
+    }
+
+    updateDraw(payload)
+  }
+
+  const openExportModal = () => {
+    if (!draw) {
+      return
+    }
+
+    openModal({
+      component: ExportFile,
+      props: {
+        drawId: draw.id,
+      },
     })
   }
 
   React.useEffect(() => {
-    if (draw?.scene) {
-      excalidrawAPI?.updateScene(draw.scene)
-      excalidrawAPI?.scrollToContent()
-    } else {
-      excalidrawAPI?.resetScene()
+    if (!(draw?.scene && !hasLoadedDrawRef.current && excalidrawAPI)) {
+      return
     }
-  }, [draw])
 
+    const files = draw.scene.files as BinaryFileData[] 
+
+    if (files.length) {
+      excalidrawAPI.addFiles(draw.scene.files as BinaryFileData[])
+    }
+
+    excalidrawAPI.updateScene(draw.scene)
+    excalidrawAPI.scrollToContent()
+    hasLoadedDrawRef.current = true
+  
+  }, [draw?.scene, excalidrawAPI])
+
+  React.useEffect(() => {
+    hasLoadedDrawRef.current = false
+    // excalidrawAPI?.resetScene()
+  }, [params.drawId])
 
   return (
     <Flex align="start" direction="column">
-      <Flex direction="row" justifyContent="start">
-        {
-          isEditingName ? (
-            <form onSubmit={form.handleSubmit(handleUpdateName)}>
-              <FormProvider {...form}>
-                <Flex direction="row" justifyContent="start">
-                  <InputHF 
-                    name="name" 
-                    inputProps={{ placeholder: 'Write a name for your draw' }} 
-                  />
-                  <IconButton aria-label="confirm-update" icon={<FiCheck />} type="submit" />
-                  <IconButton aria-label="cancel-update" icon={<FiX />} onClick={resetForm} />
-                </Flex>
-              </FormProvider>
-            </form>
-          ) : (
-            <Heading as="h3" size="lg" onClick={onToggle} cursor="pointer" >
-              {draw?.name}
-            </Heading>
-          )
-        }
+      <Flex direction="row" justifyContent="start" alignItems="center" gap={2}>
+        <Heading as="h3" size="lg" cursor="pointer" >
+          {draw?.name}
+        </Heading>
+        
+        <Button leftIcon={<FiDownload />} onClick={openExportModal}>
+            Export
+        </Button>
       </Flex>
       <Divider orientation="horizontal" />
       <Box position="relative" width="100%">
         <Box height="-webkit-fill-available" width="100%" position="absolute" paddingY={4}>
           <Excalidraw
             ref={(api: ExcalidrawImperativeAPI) => setExcalidrawAPI(api)}
-            onChange={(_elements, _state) => {
-              // handleChange([...elements], state)
+            // eslint-disable-next-line max-params
+            onChange={(elements, appState, files) => {
+              debounceUpdateScene(() => handleChange([...elements], appState, files))
             }}
             viewModeEnabled={viewModeEnabled}
             gridModeEnabled={gridModeEnabled}

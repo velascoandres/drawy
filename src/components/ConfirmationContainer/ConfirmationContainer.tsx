@@ -27,10 +27,14 @@ const ConfirmationContainer = () => {
       isOpen={isOpen}
       leastDestructiveRef={cancelRef}
       onClose={closeConfirmation}
+      isCentered
     >
 
       {confirmationProps && (
-        <AlertDialogOverlay>
+        <AlertDialogOverlay 
+          bg='blackAlpha.300'
+          backdropFilter='blur(10px) hue-rotate(90deg)'
+        >
           <AlertDialogContent>
             <AlertDialogHeader fontSize='lg' fontWeight='bold'>
               {confirmationProps.title}

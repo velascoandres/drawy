@@ -1,9 +1,12 @@
+import React from 'react'
 import { beforeEach, describe, expect, it, Mock } from 'vitest'
 
 import userEvent from '@testing-library/user-event'
 
+import ExportFile from '@/modals/ExportFile/ExportFile'
 import { useUpdateDrawMutation } from '@/mutations/drawMutations'
 import { useGetDrawByIdQuery } from '@/queries/drawQueries'
+import useModalStore from '@/store/modal/modalStore'
 import { customRender } from '@/test-utils/custom-render'
 
 import DrawPage from './DrawPage'
@@ -17,7 +20,8 @@ vi.mock('@/queries/drawQueries')
 vi.mock('@/mutations/drawMutations')
 
 vi.mock('@excalidraw/excalidraw', () => ({
-  Excalidraw: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  // eslint-disable-next-line react/display-name
+  Excalidraw: React.forwardRef(({ children }: { children: React.ReactNode }) => <div>{children}</div>),
 }))
 
 const updateDrawMock = vi.fn()
@@ -33,34 +37,24 @@ describe('<DrawPage /> tests', () => {
   })
 
   describe('When renders', () => { 
+    it('should show export button', () => {
+      const { getByText } = customRender(<DrawPage />)
+    
+      expect(getByText('Export')).toBeInTheDocument()
+    })
+
+    it('should show open ExportFile modal', async () => {
+      const { getByText } = customRender(<DrawPage />)
+    
+      await userEvent.click(getByText('Export'))
+
+      expect(useModalStore.getState().isOpen).toBeTruthy()
+      expect(useModalStore.getState().currentModal?.component).toStrictEqual(ExportFile) 
+    })
+
     it('should show draw name', () => {
       const { getByText } = customRender(<DrawPage />)
     
-      expect(getByText('Draw name test')).toBeInTheDocument()
-    })
-  })
-
-  describe('When update the draw name', () => { 
-    it('should call update mutation', async () => {
-      const { getByDisplayValue, getByLabelText, getByText } = customRender(<DrawPage />)
-        
-      
-      await userEvent.click(getByText('Draw name test'))
-      await userEvent.type(getByDisplayValue('Draw name test'), ' update 2')
-      await userEvent.click(getByLabelText('confirm-update'))
-
-      expect(updateDrawMock).toHaveBeenCalledWith({ id: '1', name: 'Draw name test update 2' })
-    })
-
-    it('should not call update mutation if cancel update', async () => {
-      const { getByDisplayValue, getByLabelText, getByText } = customRender(<DrawPage />)
-          
-        
-      await userEvent.click(getByText('Draw name test'))
-      await userEvent.type(getByDisplayValue('Draw name test'), ' update 2')
-      await userEvent.click(getByLabelText('cancel-update'))
-  
-      expect(updateDrawMock).not.toHaveBeenCalled()
       expect(getByText('Draw name test')).toBeInTheDocument()
     })
   })

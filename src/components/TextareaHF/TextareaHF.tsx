@@ -1,30 +1,37 @@
 import { Controller, useFormContext } from 'react-hook-form'
 
-import { FormControl, FormErrorMessage, FormHelperText, FormLabel, Input, InputProps } from '@chakra-ui/react'
+import { 
+  FormControl, 
+  FormErrorMessage, 
+  FormHelperText, 
+  FormLabel, 
+  Textarea, 
+  TextareaProps
+} from '@chakra-ui/react'
 
-interface InputHFProps {
+interface IProps {
     name: string
     label?: string
-    inputProps: InputProps
+    textareaProps: TextareaProps
     helperText?: string
 }
 
-const InputHF = (props: InputHFProps) => {
-  const { name, inputProps, label, helperText } = props
+const TextareaHF = (props: IProps) => {
+  const { name, textareaProps, label, helperText } = props
   const { control } = useFormContext()
 
   return (
     <Controller
       name={name}
       control={control}
-      defaultValue={inputProps.value || ''}
+      defaultValue={textareaProps.value || ''}
       render={({ field, fieldState }) => (
         <FormControl isInvalid={fieldState.invalid}>
           {label && <FormLabel>{label}</FormLabel>}
-          <Input
+          <Textarea
             {...field}
-            {...inputProps}
-            value={field.value}
+            {...textareaProps}
+            value={field.value || ''}
             name={name}
           />
           {
@@ -43,4 +50,4 @@ const InputHF = (props: InputHFProps) => {
 }
 
 
-export default InputHF
+export default TextareaHF

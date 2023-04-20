@@ -5,7 +5,10 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['./vitest.setup.ts']
+    setupFiles: ['./vitest.setup.ts'],
+    deps: {
+      inline: ['vitest-canvas-mock'],
+    },
   },
   resolve: {
     alias: {
@@ -22,6 +25,7 @@ export default defineConfig({
       '@/store': path.resolve(__dirname, './src/store/'),
       '@/modals': path.resolve(__dirname, './src/modals/'),
       '@/test-utils': path.resolve(__dirname, './test-utils/'),
+      '@/styles': path.resolve(__dirname, './src/styles/'),
     }
   },
 })

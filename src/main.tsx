@@ -12,12 +12,14 @@ import ConfirmationContainer from '@/components/ConfirmationContainer/Confirmati
 import ModalContainer from '@/components/ModalContainer/ModalContainer'
 import ROUTES from '@/constants/routes'
 
+import '@/styles/main.css'
+
 const router = createBrowserRouter(ROUTES)
 
 const queryClient = new QueryClient()
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
+  <>
     <QueryClientProvider client={queryClient}>
       <ChakraProvider>
         <RouterProvider router={router} />
@@ -25,5 +27,5 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         <ConfirmationContainer />
       </ChakraProvider>
     </QueryClientProvider>
-  </React.StrictMode>,
+  </>,
 )

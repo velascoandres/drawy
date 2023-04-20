@@ -12,10 +12,27 @@ export interface IRawDraw {
   raw_elements?: string
 }
 
+export interface IDrawInfo {
+  id: string
+  name: string
+  description?: string
+}
+
 export interface IBackendResponse<T> {
     error?: string
     data?: T
 }
+
+export interface IPaginatedResponse<T> extends IBackendResponse<T> {
+  count: number
+}
+
+export interface IUpdateDraw {
+  id: string
+  name?: string
+  description?: string
+  scene?: Record<string, unknown>
+} 
 
 const createDraw = async (newDraw: Omit<IDraw, 'id'>): Promise<IBackendResponse<string>> => {
   const result = await invoke('create_draw_command', {
@@ -26,11 +43,12 @@ const createDraw = async (newDraw: Omit<IDraw, 'id'>): Promise<IBackendResponse<
   return JSON.parse(result as string)
 }
 
-const updateDraw = async (id: string, draw: Omit<IDraw, 'id'>): Promise<IBackendResponse<boolean>> => {
+const updateDraw = async (id: string, draw: IUpdateDraw): Promise<IBackendResponse<boolean>> => {
   const result = await invoke('update_draw_command', {
     drawId: id,
     name: draw.name,
-    elementsMeta: JSON.stringify(draw.scene || {})
+    description: draw.description,
+    elementsMeta: draw.scene ? JSON.stringify(draw.scene) : null
   })
 
   return JSON.parse(result as string)
@@ -57,10 +75,19 @@ const findOneDraw = async (id: string): Promise<IBackendResponse<IRawDraw>> => {
   return JSON.parse(result as string)
 }
 
+const findDrawsInfo = async (limit: number): Promise<IPaginatedResponse<IDrawInfo[]>> => {
+  const result = await invoke('find_info_draws_command', {
+    limit,
+  })
+
+  return JSON.parse(result as string)
+}
+
 export default {
   createDraw,
   updateDraw,
   deleteDraw,
   findDraws,
-  findOneDraw
+  findOneDraw,
+  findDrawsInfo
 }

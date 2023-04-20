@@ -2,7 +2,8 @@
 /* eslint-disable max-params */
 import { useMutation, useQueryClient } from 'react-query'
 
-import drawService, { IDraw } from '@/services/drawService'
+import { IDrawInfoQueryResponse } from '@/queries/drawQueries'
+import drawService, { IDraw, IUpdateDraw } from '@/services/drawService'
 
 export const useCreateDrawMutation = () => {
   const queryClient = useQueryClient()
@@ -18,21 +19,31 @@ export const useCreateDrawMutation = () => {
       return response.data as string
     },
     onSuccess: async (newDrawId: string, drawPayload: Omit<IDraw, 'id'>) => {
-      const newDraw = {
+      const newDrawInfo = {
         id: newDrawId,
-        ...drawPayload
+        name: drawPayload.name,
       }
 
-      queryClient.setQueryData('draws', (old: IDraw[] | undefined) => [...old || [], newDraw])
+      queryClient.setQueryData('draws_info', (old: IDrawInfoQueryResponse | undefined) => {
+        const prev = old || { results: [], count: 0 }
+
+        const updatedResults = [newDrawInfo, ...prev.results]
+
+        return {
+          ...prev,
+          results: updatedResults,
+          count: prev.count + 1
+        }
+      })
     }
   })
 }
 
-export const useUpdateDrawMutation = () => {
+export const useUpdateDrawMutation = () => {  
   const queryClient = useQueryClient()
-  
+
   return useMutation({
-    mutationFn: async (draw: IDraw) => {
+    mutationFn: async (draw: IUpdateDraw) => {
       const response = await drawService.updateDraw(draw.id, draw)
   
       if (response.error) {
@@ -41,31 +52,54 @@ export const useUpdateDrawMutation = () => {
   
       return response.data
     },
-    onMutate: async (updatedDraw: IDraw) => {
-      await queryClient.cancelQueries({ queryKey: ['draws'] })
-      await queryClient.cancelQueries({ queryKey: 'draw' })
-  
-      const previousDraws = queryClient.getQueryData(['draws'])
-      const previousDraw = queryClient.getQueryData(['draw', updatedDraw.id]) as IDraw
-  
-      queryClient.setQueryData(['draws'], (old: IDraw[] | undefined) => {
-        const prev = old || []
-        const index = prev.findIndex(prevDraw => prevDraw.id === updatedDraw.id)
+    onMutate: async (draw: IUpdateDraw) => {
+      await queryClient.cancelQueries({ queryKey: ['draws_info'] })
+    
+      const previousDraws = queryClient.getQueryData(['draws_info'])
+      const drawById = queryClient.getQueryData(['draw', draw.id])
 
-        return prev.splice(index, 1, updatedDraw)
+      if (draw.scene) {
+        return { previousDraws, drawById }
+      }
+    
+      queryClient.setQueryData(['draws_info'], (old: IDrawInfoQueryResponse | undefined) => {
+        const prev = old || { results: [], count: 0 }
+        const index = prev.results.findIndex(prevDraw => prevDraw.id === draw.id)
+
+        const oldDraw = prev.results[index]
+
+        const updatedDraw = {
+          ...draw,
+          name: draw.name || oldDraw.name
+        }
+        const draws = [...prev.results]
+
+        draws.splice(index, 1, updatedDraw)
+
+        return {
+          count: prev.count - 1,
+          results: draws,
+        }
       })
 
-      queryClient.setQueryData(['draw', updatedDraw.id], { ...updatedDraw })
-  
-      return { previousDraws, previousDraw }
+      queryClient.setQueryData(['draw', draw.id], (old: unknown) => {
+        const oldDraw = old as IDraw
+
+        if (oldDraw) {
+          return {
+            ...draw,
+            id: oldDraw.id,
+            scene: oldDraw.scene
+          }
+        }
+
+      })
+    
+      return { previousDraws, drawById }
     },
-    onError: (_err, _newDraw, context) => {
-      queryClient.setQueryData(['draws'], context?.previousDraws)
-      queryClient.setQueryData(['draw', context?.previousDraw?.id || ''], context?.previousDraw)
-    },
-    onSettled: (data, err, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['draws'] })
-      queryClient.invalidateQueries({ queryKey: ['draw', variables.id] })
+    onError: (_err, updatedDraw, context) => {
+      queryClient.setQueryData(['draws_info'], context?.previousDraws)
+      queryClient.setQueryData(['draw', updatedDraw.id], context?.drawById)
     },
   })
 }
@@ -84,24 +118,28 @@ export const useDeleteDrawMutation = () => {
       return response.data
     },
     onMutate: async (drawId: string) => {
-      await queryClient.cancelQueries({ queryKey: ['draws'] })
+      await queryClient.cancelQueries({ queryKey: ['draws_info'] })
     
-      const previousDraws = queryClient.getQueryData(['draws'])
+      const previousDraws = queryClient.getQueryData(['draws_info'])
     
-      queryClient.setQueryData(['draws'], (old: IDraw[] | undefined) => {
-        const prev = old || []
-        const index = prev.findIndex(prevDraw => prevDraw.id === drawId)
+      queryClient.setQueryData(['draws_info'], (old: IDrawInfoQueryResponse | undefined) => {
+        const prev = old || { results: [], count: 0 }
+        const index = prev.results.findIndex(prevDraw => prevDraw.id === drawId)
 
-        return prev.splice(index, 1)
+        const draws = [...prev.results]
+
+        draws.splice(index, 1)
+
+        return {
+          count: prev.count - 1,
+          results: draws,
+        }
       })
     
       return { previousDraws }
     },
     onError: (_err, _newDraw, context) => {
-      queryClient.setQueryData(['draws'], context?.previousDraws)
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['draws'] })
+      queryClient.setQueryData(['draws_info'], context?.previousDraws)
     },
   })
 }
