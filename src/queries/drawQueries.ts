@@ -1,12 +1,10 @@
 import { useQuery } from 'react-query'
 
 import PAGINATION from '@/constants/pagination'
-import drawService, { IDraw, IDrawInfo } from '@/services/drawService'
+import drawService, { IDraw, IDrawInfo, IPaginatedResponse } from '@/services/drawService'
 
-export interface IDrawInfoQueryResponse {
-  results: IDrawInfo[], 
-  count: number
-}
+const FIRST_PAGE = 1
+const INITAL_OFFSET = 0
 
 export const useGetDrawsQuery = () => {
   return useQuery({
@@ -52,21 +50,24 @@ export const useGetDrawByIdQuery = (id: string) => {
   })
 }
 
-export const useGetDrawsInfoQuery = (limit = PAGINATION.INFO_DRAW_PAGINATION) => {
-  return useQuery({
+export const useGetDrawsInfoQuery = (page = FIRST_PAGE) => {
+  const offset = page > FIRST_PAGE ? page * PAGINATION.INFO_DRAW_PAGINATION : INITAL_OFFSET
+
+  return useQuery<IPaginatedResponse<IDrawInfo>>({
     queryKey: 'draws_info',
-    enabled: Boolean(limit),
     queryFn: async () => {
-      const response = await drawService.findDrawsInfo(limit)
+      const response = await drawService.findDrawsInfo(offset)
 
       if (response.error) {
         throw new Error('Error on fetching draws info')
       }
 
       return {
-        results: response.data,
-        count: response.count
-      }  
+        results: response.data || [],
+        count: response.count,
+        totalPages: response.total_pages,
+      }
     },
   })
 }
+

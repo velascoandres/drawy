@@ -2,8 +2,8 @@
 /* eslint-disable max-params */
 import { useMutation, useQueryClient } from 'react-query'
 
-import { IDrawInfoQueryResponse } from '@/queries/drawQueries'
-import drawService, { IDraw, IUpdateDraw } from '@/services/drawService'
+import PAGINATION from '@/constants/pagination'
+import drawService, { IDraw, IDrawInfo, IPaginatedResponse, IUpdateDraw } from '@/services/drawService'
 
 export const useCreateDrawMutation = () => {
   const queryClient = useQueryClient()
@@ -24,8 +24,8 @@ export const useCreateDrawMutation = () => {
         name: drawPayload.name,
       }
 
-      queryClient.setQueryData('draws_info', (old: IDrawInfoQueryResponse | undefined) => {
-        const prev = old || { results: [], count: 0 }
+      queryClient.setQueryData<IPaginatedResponse<IDrawInfo>>('draws_info', (old) => {
+        const prev = old || { results: [], count: 0, totalPages: 0 }
 
         const updatedResults = [newDrawInfo, ...prev.results]
 
@@ -62,8 +62,8 @@ export const useUpdateDrawMutation = () => {
         return { previousDraws, drawById }
       }
     
-      queryClient.setQueryData(['draws_info'], (old: IDrawInfoQueryResponse | undefined) => {
-        const prev = old || { results: [], count: 0 }
+      queryClient.setQueryData<IPaginatedResponse<IDrawInfo>>(['draws_info'], (old) => {
+        const prev = old || { results: [], count: 0, totalPages: 0 }
         const index = prev.results.findIndex(prevDraw => prevDraw.id === draw.id)
 
         const oldDraw = prev.results[index]
@@ -77,8 +77,9 @@ export const useUpdateDrawMutation = () => {
         draws.splice(index, 1, updatedDraw)
 
         return {
-          count: prev.count - 1,
+          count: prev.count,
           results: draws,
+          totalPages: prev.totalPages
         }
       })
 
@@ -122,17 +123,19 @@ export const useDeleteDrawMutation = () => {
     
       const previousDraws = queryClient.getQueryData(['draws_info'])
     
-      queryClient.setQueryData(['draws_info'], (old: IDrawInfoQueryResponse | undefined) => {
+      queryClient.setQueryData<IPaginatedResponse<IDrawInfo>>(['draws_info'], (old) => {
         const prev = old || { results: [], count: 0 }
         const index = prev.results.findIndex(prevDraw => prevDraw.id === drawId)
 
         const draws = [...prev.results]
 
         draws.splice(index, 1)
+        const newCount = prev.count - 1
 
         return {
-          count: prev.count - 1,
+          count: newCount,
           results: draws,
+          totalPages: Math.ceil(newCount / PAGINATION.INFO_DRAW_PAGINATION)
         }
       })
     
