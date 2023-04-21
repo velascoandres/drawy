@@ -22,6 +22,10 @@ chrono = "0.4.24"
 diesel = {version = "2.0.3", features = ["sqlite", "chrono"] }
 dotenv = "0.15.0"
 
+[dependencies.rusqlite]
+version = "0.29.0"
+features = ["bundled"]
+
 [dependencies.uuid]
 version = "1.3.0"
 features = [
