@@ -23,8 +23,16 @@ export interface IBackendResponse<T> {
     data?: T
 }
 
-export interface IPaginatedResponse<T> extends IBackendResponse<T> {
+export interface IPaginatedResponseRaw<T> extends IBackendResponse<T> {
   count: number
+  total_pages: number
+}
+
+export interface IPaginatedResponse<T> {
+  results: T[]
+  count: number
+  totalPages: number
+  error?: string
 }
 
 export interface IUpdateDraw {
@@ -75,9 +83,9 @@ const findOneDraw = async (id: string): Promise<IBackendResponse<IRawDraw>> => {
   return JSON.parse(result as string)
 }
 
-const findDrawsInfo = async (limit: number): Promise<IPaginatedResponse<IDrawInfo[]>> => {
+const findDrawsInfo = async (offset: number): Promise<IPaginatedResponseRaw<IDrawInfo[]>> => {
   const result = await invoke('find_info_draws_command', {
-    limit,
+    offset,
   })
 
   return JSON.parse(result as string)

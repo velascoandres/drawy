@@ -44,4 +44,10 @@ pub struct UpdateDraw {
     pub name: Option<String>,
     pub description: Option<String>,
     pub raw_elements: Option<String>,
+    pub updated_at: chrono::NaiveDateTime,}
+
+pub struct UpdateDrawBody {
+    pub name: Option<String>,
+    pub description: Option<String>,
+    pub raw_elements: Option<String>,
 }

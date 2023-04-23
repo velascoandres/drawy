@@ -1,7 +1,7 @@
 use diesel::result::Error;
 use serde::Serialize;
 
-use crate::{draws, state::AppState, models::{DrawInfo, UpdateDraw}};
+use crate::{draws, state::AppState, models::{DrawInfo, UpdateDrawBody}};
 
 #[derive(Serialize)]
 struct Response<T> {
@@ -13,7 +13,8 @@ struct Response<T> {
 pub struct PagitanedResponse<T> {
     pub data: Option<Vec<T>>,
     pub count: i64,
-    error: Option<String>,
+    pub total_pages: i64,
+    pub error: Option<String>,
 }
 
 #[tauri::command]
@@ -70,7 +71,7 @@ pub fn update_draw_command(
     let result = draws::update_draw(
         conn, 
         draw_id, 
-        &UpdateDraw {
+        UpdateDrawBody {
             name,
             description,
             raw_elements: elements_meta,
@@ -101,16 +102,16 @@ pub fn delete_draw_command(draw_id: String, state: tauri::State<AppState>) -> St
 }
 
 #[tauri::command]
-pub fn find_info_draws_command(limit: i64, state: tauri::State<AppState>) -> String {
+pub fn find_info_draws_command(offset: i64, state: tauri::State<AppState>) -> String {
     let conn = &mut *state.conn.lock().unwrap();
 
-    let result = draws::find_info_draws_paginated(conn, limit);
+    let result = draws::find_info_draws_paginated(conn, offset);
 
     let response = match result {
-        Ok((info, count)) => PagitanedResponse::<DrawInfo> { data: Some(info), count, error: None },
-        Err(Error::DatabaseError(e, _)) => PagitanedResponse::<DrawInfo> { data: None, count: 0,error: Some(format!("Database error: {:?}", e)) },
-        _ => PagitanedResponse::<DrawInfo> { data: None, count: 0, error: Some("An error has occured".to_string()) },
+        Ok((info, count, total_pages)) => PagitanedResponse::<DrawInfo> { data: Some(info), count, error: None, total_pages },
+        Err(Error::DatabaseError(e, _)) => PagitanedResponse::<DrawInfo> { data: None, count: 0,error: Some(format!("Database error: {:?}", e)), total_pages: 0 },
+        _ => PagitanedResponse::<DrawInfo> { data: None, count: 0, error: Some("An error has occured".to_string()), total_pages: 0 },
     };
 
     serde_json::to_string(&response).unwrap()
-} 
+}
