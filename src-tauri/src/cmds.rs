@@ -1,7 +1,7 @@
 use diesel::result::Error;
 use serde::Serialize;
 
-use crate::{draws, state::AppState, models::{DrawInfo, UpdateDraw, UpdateDrawBody}};
+use crate::{draws, state::AppState, models::{DrawInfo, UpdateDrawBody}};
 
 #[derive(Serialize)]
 struct Response<T> {
