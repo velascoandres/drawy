@@ -57,6 +57,8 @@ const DrawPage = () => {
       return
     }
 
+    const filesToUpdate = files || {}
+
     const payload = {
       id: draw.id,
       name: draw.name,
@@ -69,8 +71,8 @@ const DrawPage = () => {
         }, 
         scrollToContent: true, 
         libraryItems: initialData.libraryItems,
-        files: Object.values(files || {}),
-        rawFiles: files,
+        files: Object.values(filesToUpdate),
+        rawFiles: filesToUpdate,
       },
     }
 
@@ -97,7 +99,7 @@ const DrawPage = () => {
 
     const files = draw.scene.files as BinaryFileData[] 
 
-    if (files.length) {
+    if (files?.length) {
       excalidrawAPI.addFiles(draw.scene.files as BinaryFileData[])
     }
 
@@ -109,8 +111,8 @@ const DrawPage = () => {
 
   React.useEffect(() => {
     hasLoadedDrawRef.current = false
-    // excalidrawAPI?.resetScene()
-  }, [params.drawId])
+    excalidrawAPI?.resetScene()
+  }, [params.drawId, excalidrawAPI])
 
   return (
     <Flex align="start" direction="column">

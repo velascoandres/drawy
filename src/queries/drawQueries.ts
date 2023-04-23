@@ -51,13 +51,15 @@ export const useGetDrawByIdQuery = (id: string) => {
 }
 
 export const useGetDrawsInfoQuery = (page = FIRST_PAGE) => {
-  const offset = page > FIRST_PAGE ? page * PAGINATION.INFO_DRAW_PAGINATION : INITAL_OFFSET
+  // eslint-disable-next-line space-in-parens, no-magic-numbers
+  const offset = page > FIRST_PAGE ? (page - 1 ) * PAGINATION.INFO_DRAW_PAGINATION : INITAL_OFFSET
 
   return useQuery<IPaginatedResponse<IDrawInfo>>({
-    queryKey: 'draws_info',
+    queryKey: ['draws_info', offset],
+    cacheTime: 0,
     queryFn: async () => {
       const response = await drawService.findDrawsInfo(offset)
-
+      
       if (response.error) {
         throw new Error('Error on fetching draws info')
       }

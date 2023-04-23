@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   FiDownload,
   FiInfo,
@@ -28,6 +29,7 @@ import {
 } from '@chakra-ui/react'
 
 import DrawList, { IDrawListItem } from '@/components/DrawList/DrawList'
+import Paginator from '@/components/Paginator/Paginator'
 import StatusBar from '@/components/StatusBar/StatusBar'
 import CreateUpdateDrawModal from '@/modals/CreateUpdateDraw/CreateUpdateDrawModal'
 import ExportFile from '@/modals/ExportFile/ExportFile'
@@ -48,7 +50,9 @@ const RootPage = () => {
   const { openConfirmation } = useConfirmationStore()
   const { mutate: deleteDraw } = useDeleteDrawMutation()
 
-  const { data: response } = useGetDrawsInfoQuery()
+  const [page, setPage] = useState<number>()
+
+  const { data: response } = useGetDrawsInfoQuery(page)
 
   const navigateToDrawPage = (item: IDrawListItem) => {
     navigate(`/draw/${item.id}`)
@@ -109,6 +113,8 @@ const RootPage = () => {
       w={{ base: 'full', md: 60 }}
       pos="fixed"
       h="full"
+      top={0}
+      bottom={0}
       {...props}
       zIndex={999}
     >
@@ -129,69 +135,84 @@ const RootPage = () => {
           Add draw
         </Button>
       </Flex>
-      <DrawList 
-        items={response?.results || []} 
-        selectedValue={params.drawId}
-        onSelectDraw={navigateToDrawPage}
-      > 
+      <Box overflowY="auto" height="75%">
+        <DrawList 
+          items={response?.results || []} 
+          selectedValue={params.drawId}
+          onSelectDraw={navigateToDrawPage}
+        > 
 
-        {(draw, isSelected) => (
-          <Flex 
-            direction="row" 
-            gap={2} 
-            alignContent="space-between" 
-            width="100%"
-            alignItems="center"
-          >
-            <Heading 
-              as='h6' 
-              size='xs' 
+          {(draw, isSelected) => (
+            <Flex 
+              direction="row" 
+              gap={2} 
+              alignContent="space-between" 
               width="100%"
-              noOfLines={1}
+              alignItems="center"
             >
-              {draw.name}
-            </Heading>
+              <Heading 
+                as='h6' 
+                size='xs' 
+                width="100%"
+                noOfLines={1}
+              >
+                {draw.name}
+              </Heading>
 
-            <Menu>
-              <MenuButton
-                as={IconButton}
-                aria-label="options"
-                bg="transparent"
-                _hover={{ bg: 'tranparent', borderWidth: '1px', borderColor: isSelected ? 'white' : 'black' }}
-                _expanded={{ bg: 'transparent', borderWidth: '1px', borderColor: isSelected ? 'white' : 'black' }}
-                icon={<FiMoreVertical />}
-                onClick={(e) => e.stopPropagation()}
-              />
-              <MenuList zIndex={9999}>
-                <MenuItem 
-                  color="black"
-                  aria-label="info"
-                  icon={<FiInfo />} 
-                  onClick={openCrateUpdateDrawModal(draw)}
-                >
+              <Menu>
+                <MenuButton
+                  as={IconButton}
+                  aria-label="options"
+                  bg="transparent"
+                  _hover={{ bg: 'tranparent', borderWidth: '1px', borderColor: isSelected ? 'white' : 'black' }}
+                  _expanded={{ bg: 'transparent', borderWidth: '1px', borderColor: isSelected ? 'white' : 'black' }}
+                  icon={<FiMoreVertical />}
+                  onClick={(e) => e.stopPropagation()}
+                />
+                <MenuList zIndex={9999}>
+                  <MenuItem 
+                    color="black"
+                    aria-label="info"
+                    icon={<FiInfo />} 
+                    onClick={openCrateUpdateDrawModal(draw)}
+                  >
                   Information
-                </MenuItem>
-                <MenuItem 
-                  color="black"
-                  aria-label="download"
-                  icon={<FiDownload />} 
-                  onClick={openExportModal(draw)}
-                >
+                  </MenuItem>
+                  <MenuItem 
+                    color="black"
+                    aria-label="download"
+                    icon={<FiDownload />} 
+                    onClick={openExportModal(draw)}
+                  >
                   Export
-                </MenuItem>
-                <MenuItem 
-                  color="black"
-                  aria-label="remove"
-                  icon={<FiTrash />} 
-                  onClick={handleDeleteDraw(draw)}
-                >
+                  </MenuItem>
+                  <MenuItem 
+                    color="black"
+                    aria-label="remove"
+                    icon={<FiTrash />} 
+                    onClick={handleDeleteDraw(draw)}
+                  >
                   Remove
-                </MenuItem>
-              </MenuList>
-            </Menu>
-          </Flex>
-        )}
-      </DrawList>
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+            </Flex>
+          )}
+        </DrawList>
+      </Box>
+      <Box position="absolute" bottom={0} bg="white" w="full" marginTop={20}>
+        {
+          response && (
+            <Paginator 
+              page={page} 
+              totalPages={response.totalPages}
+              onPageChange={(page) => {
+                setPage(page)
+              }}
+            />
+          ) 
+        }
+      </Box>
     </Box>
   )
 
