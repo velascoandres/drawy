@@ -7,10 +7,11 @@ interface IProps {
     label: string
     value?: boolean
     switchProps?: SwitchProps
+    justifyContent?: 'space-between' | 'start'
 }
 
 const SwitchHF = (props: IProps) => {
-  const { name, value, label, switchProps = {} } = props
+  const { name, value, label, switchProps = {}, justifyContent = 'space-between' } = props
   const { control } = useFormContext()
 
   return (
@@ -20,13 +21,14 @@ const SwitchHF = (props: IProps) => {
       defaultValue={value}
       render={({ field }) => (
         <FormControl>
-          <Flex direction="row" alignItems="center" justifyContent="space-between">
+          <Flex direction="row" alignItems="center" justifyContent={justifyContent}>
             <FormLabel htmlFor='email-alerts' mb='0'>
               {label}
             </FormLabel>
             <Switch 
               {...switchProps}
               {...field}
+              isChecked={Boolean(field.value)}
               name={name}
             />
           </Flex>

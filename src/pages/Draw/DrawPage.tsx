@@ -1,4 +1,5 @@
 import React from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
 import { FiDownload } from 'react-icons/fi'
 import { useParams } from 'react-router-dom'
 
@@ -9,9 +10,7 @@ import {
   Flex, 
   Heading,
 } from '@chakra-ui/react'
-import {
-  Excalidraw,
-} from '@excalidraw/excalidraw'
+import { Excalidraw } from '@excalidraw/excalidraw'
 import {
   AppState,
   BinaryFileData,
@@ -19,6 +18,7 @@ import {
   ExcalidrawImperativeAPI,
 } from '@excalidraw/excalidraw/types/types'
 
+import SwitchHF from '@/components/SwitchHF/SwitchHF'
 import initialData from '@/constants/initial-data'
 import useDebounceCallback from '@/hooks/useDebounceCallback'
 import ExportFile from '@/modals/ExportFile/ExportFile'
@@ -27,6 +27,11 @@ import { useGetDrawByIdQuery } from '@/queries/drawQueries'
 import useModalStore from '@/store/modal/modalStore'
 
 const UPDATE_SCENE_DEBOUNCE = 1000
+
+interface IDrawUIStatus {
+  darkMode: boolean
+  grid: boolean
+}
 
 const DrawPage = () => {
   const params = useParams()
@@ -39,9 +44,12 @@ const DrawPage = () => {
 
   const debounceUpdateScene = useDebounceCallback(UPDATE_SCENE_DEBOUNCE)
 
-  const [viewModeEnabled] = React.useState(false)
-  const [gridModeEnabled] = React.useState(false)
-  const [theme] = React.useState('light')
+  const form = useForm<IDrawUIStatus>({
+    defaultValues: {
+      grid: false,
+      darkMode: false,
+    }
+  })
 
   const [
     excalidrawAPI,
@@ -58,7 +66,6 @@ const DrawPage = () => {
     }
 
     const filesToUpdate = files || {}
-
     const payload = {
       id: draw.id,
       name: draw.name,
@@ -68,6 +75,9 @@ const DrawPage = () => {
           viewBackgroundColor: appState.viewBackgroundColor,
           currentItemFontFamily: appState.currentItemFontFamily,
           currentItemFontSize: appState.currentItemFontSize,
+          theme: appState.theme,
+          exportWithDarkMode: appState.exportWithDarkMode,
+          gridSize: appState.gridSize,
         }, 
         scrollToContent: true, 
         libraryItems: initialData.libraryItems,
@@ -110,6 +120,18 @@ const DrawPage = () => {
   }, [draw?.scene, excalidrawAPI])
 
   React.useEffect(() => {
+    if (!draw?.scene) {
+      return
+    }
+
+    const hasDarkMode = draw.scene?.appState?.theme === 'dark'
+    const hasGrid = Boolean(draw.scene?.appState?.gridSize)
+
+    form.setValue('darkMode', hasDarkMode)
+    form.setValue('grid', hasGrid)
+  }, [draw?.scene, form])
+
+  React.useEffect(() => {
     hasLoadedDrawRef.current = false
     excalidrawAPI?.resetScene()
   }, [params.drawId, excalidrawAPI])
@@ -125,18 +147,24 @@ const DrawPage = () => {
             Export
         </Button>
       </Flex>
+      <FormProvider {...form}>
+        <Flex direction="row" justifyContent="start" gap={0} width="25%">
+          <SwitchHF label="Dark mode:" name="darkMode" justifyContent="start" />
+          <SwitchHF label="Enable grid:" name="grid" justifyContent="start" />
+        </Flex> 
+      </FormProvider>
       <Divider orientation="horizontal" />
       <Box position="relative" width="100%">
-        <Box height="-webkit-fill-available" width="100%" position="absolute" paddingY={4}>
+        <Box height="-webkit-fill-available" width="100%" position="absolute" paddingY={8}>
           <Excalidraw
             ref={(api: ExcalidrawImperativeAPI) => setExcalidrawAPI(api)}
             // eslint-disable-next-line max-params
             onChange={(elements, appState, files) => {
               debounceUpdateScene(() => handleChange([...elements], appState, files))
             }}
-            viewModeEnabled={viewModeEnabled}
-            gridModeEnabled={gridModeEnabled}
-            theme={theme}
+            viewModeEnabled={false}
+            gridModeEnabled={form.watch('grid')}
+            theme={form.watch('darkMode') ? 'dark' : 'light'}
             name="Custom name of drawing"
             UIOptions={{ canvasActions: { loadScene: false } }}
           />

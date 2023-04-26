@@ -198,6 +198,7 @@ const ExportFile = (props: IProps) => {
                   <Heading as='h5' size="md">
                     Options:
                   </Heading>
+                  {/* <SwitchHF label="Export with dark mode:" name="withDarkTheme" value={false} /> */}
                   <SwitchHF label="Export with embed scene:" name="withEmbebScene" value={false} />
                   <SwitchHF label="Mantain background:" name="withBackground" value={false} />  
                 </Flex>
@@ -245,7 +246,8 @@ const ExportPreview = (props: IPreviewProps) => {
         exportWithDarkMode: watchWithDarkTheme,
         exportBackground: watchWithBackground,
         exportEmbedScene: watchWithEmbebScene,
-        exportScale: 0.1
+        theme: watchWithDarkTheme ? 'dark' : 'light',
+        exportScale: 0.1,
       },
       files
     }).then((file) => {

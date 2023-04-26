@@ -9,10 +9,10 @@ const StatusBar = () => {
 
   const status = React.useMemo(() => {
     if (isFetching) {
-      return 'Some info is fetching...'
+      return 'Synchronizing data'
     }
     if (isMutating) {
-      return 'Some info is updating...'  
+      return 'Some info is updating'  
     }
 
     return 'All ok ✅'

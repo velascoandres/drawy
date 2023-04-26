@@ -35,7 +35,7 @@ describe('<StatusBar />', () => {
     it('should show message for "isFetching"', () => {
       const { getByText } = customRender(<StatusBar />)
     
-      expect(getByText('Some info is fetching...')).toBeInTheDocument()
+      expect(getByText('Synchronizing data')).toBeInTheDocument()
     })
   })
 
@@ -47,7 +47,7 @@ describe('<StatusBar />', () => {
     it('should show message for "isMutating"', () => {
       const { getByText } = customRender(<StatusBar />)
     
-      expect(getByText('Some info is updating...')).toBeInTheDocument()
+      expect(getByText('Some info is updating')).toBeInTheDocument()
     })
   })
 })
