@@ -6,9 +6,7 @@ const DEFAULT_DEBOUNCE_TIME = 500
 type ICallBack = () => void
 
 const useDebounceCallback = (delay?: number) => {
-  const timerRef = React.useRef<NodeJS.Timer | null>(null)  
-  const callbackRef = React.useRef<ICallBack | null>(null) 
-  const [] = [] 
+  const timerRef = React.useRef<NodeJS.Timer | null>(null)
 
   const debounceCallback = React.useCallback((cb: ICallBack) => {
     cleanTimer()
@@ -16,7 +14,7 @@ const useDebounceCallback = (delay?: number) => {
     timerRef.current = setTimeout(() => {  
       cb()
     }, delay || DEFAULT_DEBOUNCE_TIME)
-  }, [])
+  }, [delay])
 
   const cleanTimer = () => {
     if (timerRef.current) {
@@ -28,7 +26,7 @@ const useDebounceCallback = (delay?: number) => {
     return () => {
       cleanTimer()
     }
-  }, [delay, callbackRef.current])
+  }, [delay])
 
   return debounceCallback
 }

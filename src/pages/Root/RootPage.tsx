@@ -19,17 +19,18 @@ import {
   Flex,
   Heading,
   IconButton,
+  Image,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
-  Text,
   useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react'
 
 import DrawList, { IDrawListItem } from '@/components/DrawList/DrawList'
 import Paginator from '@/components/Paginator/Paginator'
+import SearchInput from '@/components/SearchInput/SearchInput'
 import StatusBar from '@/components/StatusBar/StatusBar'
 import CreateUpdateDrawModal from '@/modals/CreateUpdateDraw/CreateUpdateDrawModal'
 import ExportFile from '@/modals/ExportFile/ExportFile'
@@ -119,12 +120,12 @@ const RootPage = () => {
       zIndex={999}
     >
       <Flex h="20" alignItems="center" mx="8" justifyContent="center">
-        <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-            Drawy
-        </Text>
+        <Image fontFamily="Virgil" width="100px" src="/logo.png" alt="drawy-logo" />
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
-      <Flex alignItems="center" justifyContent="center" marginBottom="5">
+      <Flex alignItems="center" direction="column" justifyContent="center" marginBottom="5" gap={2} mx={2}>
+        <SearchInput placeholder="Search a draw" onSearch={() => null} /> 
+
         <Button 
           leftIcon={<FiPlus />} 
           variant="outline"
@@ -248,10 +249,7 @@ const RootPage = () => {
           aria-label="open menu"
           icon={<FiMenu />}
         />
-
-        <Text fontSize="2xl" ml="8" fontFamily="monospace" fontWeight="bold">
-          Drawy
-        </Text>
+        <Image fontFamily="Virgil" width="100px" src="/logo.png" alt="drawy-logo" />
       </Flex>
       <Box ml={{ base: 0, md: 60 }} p="4">
         <Outlet />

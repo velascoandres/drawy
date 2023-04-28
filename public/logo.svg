@@ -1,0 +1,16 @@
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 173" width="380" height="173">
+  <!-- svg-source:excalidraw -->
+  
+  <defs>
+    <style class="style-fonts">
+      @font-face {
+        font-family: "Virgil";
+        src: url("https://unpkg.com/@excalidraw/excalidraw@0.14.2/dist/excalidraw-assets/Virgil.woff2");
+      }
+      @font-face {
+        font-family: "Cascadia";
+        src: url("https://unpkg.com/@excalidraw/excalidraw@0.14.2/dist/excalidraw-assets/Cascadia.woff2");
+      }
+    </style>
+  </defs>
+  <g transform="translate(10 10) rotate(0 180 76.5)"><text x="0" y="107" font-family="Virgil, Segoe UI Emoji" font-size="120.80000000000001px" fill="#000000" text-anchor="start" style="white-space: pre;" direction="ltr">Drawy</text></g></svg>
