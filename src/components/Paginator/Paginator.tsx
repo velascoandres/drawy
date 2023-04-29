@@ -8,6 +8,8 @@ import { Flex, IconButton, Text } from '@chakra-ui/react'
 
 const DEFAULT_PAGE = 1
 const PAGINATION_FACTOR = 1
+const EMPTY_PAGE_INDICATOR = 0
+
 
 interface IProps {
     page?: number
@@ -39,7 +41,7 @@ const Paginator = (props: IProps) => {
       />
 
       <Text as="p" size="md">
-        {`${currentPage} / ${totalPages}`}
+        {`${totalPages ? currentPage : EMPTY_PAGE_INDICATOR } / ${totalPages}`}
       </Text>
       
       <IconButton

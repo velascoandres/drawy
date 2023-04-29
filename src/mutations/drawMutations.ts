@@ -56,16 +56,18 @@ export const useUpdateDrawMutation = () => {
             scene: oldDraw.scene
           }
         }
-
       })
     
-      return { drawById }
+      return { drawById, previousDraws }
     },
     onError: (_err, updatedDraw, context) => {
       queryClient.setQueryData(['draw', updatedDraw.id], context?.drawById)
     },
 
-    onSuccess: async () => {
+    onSuccess: async (_data, variables) => {
+      if (variables?.scene) {
+        return
+      }
       await queryClient.invalidateQueries({ queryKey: ['draws_info'] })
     }
   })

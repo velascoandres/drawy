@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import {
   FiDownload,
   FiInfo,
@@ -36,7 +36,7 @@ import CreateUpdateDrawModal from '@/modals/CreateUpdateDraw/CreateUpdateDrawMod
 import ExportFile from '@/modals/ExportFile/ExportFile'
 import { useDeleteDrawMutation } from '@/mutations/drawMutations'
 import { useGetDrawsInfoQuery } from '@/queries/drawQueries'
-import { IDrawInfo } from '@/services/drawService'
+import { IDrawInfo, IDrawInfoQuery } from '@/services/drawService'
 import useConfirmationStore from '@/store/confirmation/confirmationStore'
 import useModalStore from '@/store/modal/modalStore'
 
@@ -51,12 +51,18 @@ const RootPage = () => {
   const { openConfirmation } = useConfirmationStore()
   const { mutate: deleteDraw } = useDeleteDrawMutation()
 
-  const [page, setPage] = useState<number>()
-
-  const { data: response } = useGetDrawsInfoQuery(page)
+  const [query, setQuery] = React.useState<IDrawInfoQuery>({ page: 1 })
+  const { data: response } = useGetDrawsInfoQuery(query)
 
   const navigateToDrawPage = (item: IDrawListItem) => {
     navigate(`/draw/${item.id}`)
+  }
+
+  const handleSearch = (search: string) => {
+    setQuery({
+      search,
+      page: 1
+    })
   }
 
   const openCreateDrawModal = () => {
@@ -124,7 +130,7 @@ const RootPage = () => {
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
       <Flex alignItems="center" direction="column" justifyContent="center" marginBottom="5" gap={2} mx={2}>
-        <SearchInput placeholder="Search a draw" onSearch={() => null} /> 
+        <SearchInput placeholder="Search a draw" onSearch={handleSearch} /> 
 
         <Button 
           leftIcon={<FiPlus />} 
@@ -205,10 +211,13 @@ const RootPage = () => {
         {
           response && (
             <Paginator 
-              page={page} 
+              page={query.page} 
               totalPages={response.totalPages}
               onPageChange={(page) => {
-                setPage(page)
+                setQuery(currentQuery => ({
+                  ...currentQuery,
+                  page,
+                }))
               }}
             />
           ) 

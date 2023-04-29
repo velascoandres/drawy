@@ -55,6 +55,18 @@ describe('<Paginator /> tests', () => {
 
       expect(getByLabelText('next-page')).toBeDisabled()
     })
+
+    it('should show 0 / 0 if total pages is zero', () => {
+      const { getByText } = customRender(
+        <Paginator 
+          page={1}
+          onPageChange={vi.fn()}
+          totalPages={0}
+        />
+      )
+
+      expect(getByText('0 / 0')).toBeInTheDocument()
+    })
   })
 
   describe('When paginate', () => { 

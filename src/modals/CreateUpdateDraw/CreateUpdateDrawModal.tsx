@@ -37,8 +37,8 @@ interface IProps {
 
 const drawInfoSchema = yup.object().shape({
   name: yup.string().required('This field is required'),
-  description: yup.string().optional(),
-}).required()
+  description: yup.string().nullable(),
+})
 
 const CreateUpdateDrawModal = ({ draw }: IProps) => {
   const toast = useToast()
@@ -83,7 +83,7 @@ const CreateUpdateDrawModal = ({ draw }: IProps) => {
         isClosable: true,
       })
     }
-  }, [isSuccess])
+  }, [closeModal, isSuccess, toast])
 
   React.useEffect(() => {
     if (isUpdateSuccess) {
@@ -96,7 +96,7 @@ const CreateUpdateDrawModal = ({ draw }: IProps) => {
         isClosable: true,
       })
     }
-  }, [isUpdateSuccess])
+  }, [closeModal, isUpdateSuccess, toast])
   
   return (
     <ModalContent>

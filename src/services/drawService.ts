@@ -41,7 +41,12 @@ export interface IUpdateDraw {
   name?: string
   description?: string
   scene?: Record<string, unknown>
-} 
+}
+
+export interface IDrawInfoQuery {
+  search?: string
+  page: number
+}
 
 const createDraw = async (newDraw: Omit<IDraw, 'id'>): Promise<IBackendResponse<string>> => {
   const result = await invoke('create_draw_command', {
@@ -84,9 +89,10 @@ const findOneDraw = async (id: string): Promise<IBackendResponse<IRawDraw>> => {
   return JSON.parse(result as string)
 }
 
-const findDrawsInfo = async (offset: number): Promise<IPaginatedResponseRaw<IDrawInfo[]>> => {
+const findDrawsInfo = async ({ page, search }: IDrawInfoQuery): Promise<IPaginatedResponseRaw<IDrawInfo[]>> => {
   const result = await invoke('find_info_draws_command', {
-    offset,
+    page,
+    search
   })
 
   return JSON.parse(result as string)

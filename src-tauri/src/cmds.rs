@@ -1,7 +1,7 @@
 use diesel::result::Error;
 use serde::Serialize;
 
-use crate::{draws, state::AppState, models::{DrawInfo, UpdateDrawBody}};
+use crate::{draws, state::AppState, models::{DrawInfo, UpdateDrawBody}, constants::{INITAL_OFFSET, INFO_DRAW_PAGINATION}};
 
 #[derive(Serialize)]
 struct Response<T> {
@@ -102,10 +102,16 @@ pub fn delete_draw_command(draw_id: String, state: tauri::State<AppState>) -> St
 }
 
 #[tauri::command]
-pub fn find_info_draws_command(offset: i64, state: tauri::State<AppState>) -> String {
+pub fn find_info_draws_command(search: Option<String>, page: i64, state: tauri::State<AppState>) -> String {
     let conn = &mut *state.conn.lock().unwrap();
 
-    let result = draws::find_info_draws_paginated(conn, offset);
+    let mut offset = INITAL_OFFSET;
+
+    if page > 1 {
+        offset = (page - 1 ) * INFO_DRAW_PAGINATION;
+    }
+
+    let result = draws::find_info_draws_paginated(conn, search, offset);
 
     let response = match result {
         Ok((info, count, total_pages)) => PagitanedResponse::<DrawInfo> { data: Some(info), count, error: None, total_pages },

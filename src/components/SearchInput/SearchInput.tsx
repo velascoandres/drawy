@@ -13,7 +13,7 @@ interface IProps {
     onSearch: (search: string) => void
 }
 
-const SEARCH_DEBOUNCE_TIME = 1000
+const SEARCH_DEBOUNCE_TIME = 500
 
 const SearchInput = (props: IProps) => {
   const { placeholder, value, onSearch } = props
