@@ -1,5 +1,3 @@
-use std::fmt::format;
-
 use crate::models::{Draw, DrawInfo, UpdateDraw, UpdateDrawBody};
 use chrono::prelude::Utc;
 use diesel::prelude::*;
