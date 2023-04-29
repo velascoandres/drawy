@@ -20,6 +20,12 @@ describe('<StatusBar />', () => {
   })
   
   describe('When renders', () => {
+    it('should show status container', () => {
+      const { getByRole } = customRender(<StatusBar />)
+    
+      expect(getByRole('log')).toBeInTheDocument()
+    })
+
     it('should show default message', () => {
       const { getByText } = customRender(<StatusBar />)
     

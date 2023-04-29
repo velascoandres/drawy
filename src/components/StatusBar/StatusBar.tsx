@@ -26,6 +26,7 @@ const StatusBar = () => {
       width="100%" 
       px={1}
       ml={{ base: 0, md: 60 }}
+      role="log"
     >
       <Text fontSize="sm" color="white">{status}</Text>
     </Box>

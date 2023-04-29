@@ -19,6 +19,7 @@ describe('When window resize', () => {
     })
     expect(result.current.width).toEqual(500)
     expect(result.current.height).toEqual(800)
+    expect(result.current.isMobile).toBeTruthy()
   })
 
   it('should return update window values on multiple resize events', () => {
@@ -29,6 +30,7 @@ describe('When window resize', () => {
     })
     expect(result.current.width).toEqual(500)
     expect(result.current.height).toEqual(800)
+    expect(result.current.isMobile).toBeTruthy()
 
     vi.stubGlobal('innerWidth', 1024)
     vi.stubGlobal('innerHeight', 720)
@@ -38,5 +40,6 @@ describe('When window resize', () => {
     })
     expect(result.current.width).toEqual(1024)
     expect(result.current.height).toEqual(720)
+    expect(result.current.isMobile).toBeFalsy()
   })
 })

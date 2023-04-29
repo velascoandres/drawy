@@ -1,11 +1,7 @@
-import React, { useState } from 'react'
+import React from 'react'
 import {
-  FiDownload,
-  FiInfo,
   FiMenu,
-  FiMoreVertical, 
   FiPlus,
-  FiTrash 
 } from 'react-icons/fi'
 import { Outlet, useNavigate, useParams } from 'react-router-dom'
 
@@ -20,39 +16,38 @@ import {
   Heading,
   IconButton,
   Image,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react'
 
 import DrawList, { IDrawListItem } from '@/components/DrawList/DrawList'
+import DrawOptions from '@/components/DrawOptions/DrawOptions'
 import Paginator from '@/components/Paginator/Paginator'
 import SearchInput from '@/components/SearchInput/SearchInput'
 import StatusBar from '@/components/StatusBar/StatusBar'
+import useWindowSize from '@/hooks/useWindowSize'
 import CreateUpdateDrawModal from '@/modals/CreateUpdateDraw/CreateUpdateDrawModal'
-import ExportFile from '@/modals/ExportFile/ExportFile'
-import { useDeleteDrawMutation } from '@/mutations/drawMutations'
 import { useGetDrawsInfoQuery } from '@/queries/drawQueries'
-import { IDrawInfo, IDrawInfoQuery } from '@/services/drawService'
-import useConfirmationStore from '@/store/confirmation/confirmationStore'
+import { IDrawInfoQuery } from '@/services/drawService'
 import useModalStore from '@/store/modal/modalStore'
 
+const SMALL_HEIGHT = 300
+const MEDIUM_HEIGHT = 650
 
-// eslint-disable-next-line max-lines-per-function
+const QUARTER_SCALE_FACTOR = 0.25
+const MEDIUM_SCALE_FACTOR = 0.5
+const STANDARD_SCALE_FACTOR = 0.72
+
 const RootPage = () => {
   const { isOpen, onClose, onOpen } = useDisclosure()
   const navigate = useNavigate()
   const params = useParams()
 
   const { openModal } = useModalStore()
-  const { openConfirmation } = useConfirmationStore()
-  const { mutate: deleteDraw } = useDeleteDrawMutation()
 
   const [query, setQuery] = React.useState<IDrawInfoQuery>({ page: 1 })
   const { data: response } = useGetDrawsInfoQuery(query)
+  const { isMobile, height } = useWindowSize()
 
   const navigateToDrawPage = (item: IDrawListItem) => {
     navigate(`/draw/${item.id}`)
@@ -75,41 +70,25 @@ const RootPage = () => {
     })
   }
 
-  const openCrateUpdateDrawModal = (draw: IDrawInfo) => (e: React.MouseEvent) => {
-    e.stopPropagation()
+  const handlePageChange = (page: number) => {
+    setQuery({
+      ...query,
+      page,
+    })
+  }
+
+  const listHeight = React.useMemo(() => {
+    if (height < SMALL_HEIGHT) {
+      return height * QUARTER_SCALE_FACTOR
+    }
     
-    openModal({
-      component: CreateUpdateDrawModal,
-      props: {
-        draw,
-      },
-      config: {
-        closeOnClickOutside: false,
-        closeOnEscapeKeydown: true,
-      }
-    })
-  }
+    if (height < MEDIUM_HEIGHT) {
+      return height * MEDIUM_SCALE_FACTOR
+    }
 
-  const handleDeleteDraw = (draw: IDrawListItem) => (e: React.MouseEvent) => {
-    e.stopPropagation()
-
-    openConfirmation({
-      title: 'Confirm action',
-      content: `Do you want to delete: ${draw.name}?`,
-      onConfirm: () => deleteDraw(draw.id.toString())
-    })
-  }
-
-  const openExportModal = (draw: IDrawListItem) => (e: React.MouseEvent) => {
-    e.stopPropagation()
-
-    openModal({
-      component: ExportFile,
-      props: {
-        drawId: draw.id,
-      },
-    })
-  }
+    return height * STANDARD_SCALE_FACTOR
+      
+  }, [height])
 
 
   const renderSideContent = (props: BoxProps = {}) => (
@@ -142,7 +121,7 @@ const RootPage = () => {
           Add draw
         </Button>
       </Flex>
-      <Box overflowY="auto" height="75%">
+      <Box overflowY="auto" height={listHeight}>
         <DrawList 
           items={response?.results || []} 
           selectedValue={params.drawId}
@@ -166,59 +145,18 @@ const RootPage = () => {
                 {draw.name}
               </Heading>
 
-              <Menu>
-                <MenuButton
-                  as={IconButton}
-                  aria-label="options"
-                  bg="transparent"
-                  _hover={{ bg: 'tranparent', borderWidth: '1px', borderColor: isSelected ? 'white' : 'black' }}
-                  _expanded={{ bg: 'transparent', borderWidth: '1px', borderColor: isSelected ? 'white' : 'black' }}
-                  icon={<FiMoreVertical />}
-                  onClick={(e) => e.stopPropagation()}
-                />
-                <MenuList zIndex={9999}>
-                  <MenuItem 
-                    color="black"
-                    aria-label="info"
-                    icon={<FiInfo />} 
-                    onClick={openCrateUpdateDrawModal(draw)}
-                  >
-                  Information
-                  </MenuItem>
-                  <MenuItem 
-                    color="black"
-                    aria-label="download"
-                    icon={<FiDownload />} 
-                    onClick={openExportModal(draw)}
-                  >
-                  Export
-                  </MenuItem>
-                  <MenuItem 
-                    color="black"
-                    aria-label="remove"
-                    icon={<FiTrash />} 
-                    onClick={handleDeleteDraw(draw)}
-                  >
-                  Remove
-                  </MenuItem>
-                </MenuList>
-              </Menu>
+              <DrawOptions isOpen={isSelected} draw={draw} />
             </Flex>
           )}
         </DrawList>
       </Box>
-      <Box position="absolute" bottom={0} bg="white" w="full" marginTop={20}>
+      <Box position="absolute" bottom={0} bg="white" w="full">
         {
           response && (
             <Paginator 
               page={query.page} 
               totalPages={response.totalPages}
-              onPageChange={(page) => {
-                setQuery(currentQuery => ({
-                  ...currentQuery,
-                  page,
-                }))
-              }}
+              onPageChange={handlePageChange}
             />
           ) 
         }
@@ -263,7 +201,9 @@ const RootPage = () => {
       <Box ml={{ base: 0, md: 60 }} p="4">
         <Outlet />
       </Box>
-      <StatusBar />
+      {
+        !isMobile && <StatusBar />
+      }
     </Box>
   )
 }

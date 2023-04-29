@@ -3,7 +3,6 @@ import { describe, expect, it, Mock, vi } from 'vitest'
 
 import userEvent from '@testing-library/user-event'
 
-import ConfirmationContainer from '@/components/ConfirmationContainer/ConfirmationContainer'
 import CreateUpdateDrawModal from '@/modals/CreateUpdateDraw/CreateUpdateDrawModal'
 import { useDeleteDrawMutation } from '@/mutations/drawMutations'
 import { useGetDrawsInfoQuery } from '@/queries/drawQueries'
@@ -33,15 +32,16 @@ const items = [
 const deleteMock = vi.fn()
 
 const useGetDrawsInfoQueryMock = useGetDrawsInfoQuery as Mock
-const useDeleteDrawMutationMock = useDeleteDrawMutation as Mock
 const isFetchingMock = useIsFetching as Mock
 const isMutatingMock = useIsMutating as Mock
+const useDeleteDrawMutationMock = useDeleteDrawMutation as Mock
 
 describe('<RootPage /> tests', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     useGetDrawsInfoQueryMock.mockReturnValue({ data: { results: items, count: items.length } })
     useDeleteDrawMutationMock.mockReturnValue({ mutate: deleteMock })
+
     isFetchingMock.mockReturnValue(0)
     isMutatingMock.mockReturnValue(0)
   })
@@ -78,37 +78,16 @@ describe('<RootPage /> tests', () => {
     })
   })
 
-  describe('When click on "Delete" draw button', () => { 
-    it('should call delete mutation', async () => {
-      const { getAllByLabelText, getByText } = customRender(
-        <>
-          <ConfirmationContainer />
-          <RootPage />
-        </>
-      )
-      
-      await userEvent.click(getAllByLabelText('options')[0])
-
-      await userEvent.click(getAllByLabelText('remove')[0])
-
-      expect(getByText('Do you want to delete: draw 1?')).toBeInTheDocument()
-
-      await userEvent.click(getByText('Confirm'))
-      
-      expect(deleteMock).toHaveBeenCalledWith('1')
+  describe('When is mobile', () => {
+    beforeEach(() => {
+      vi.stubGlobal('innerWidth', 500)
+      vi.stubGlobal('innerHeight', 800)
     })
-  })
+    
+    it('should not show the status bar', () => {
+      const { queryByRole } = customRender(<RootPage />)
 
-  describe('When click on "Information" draw button', () => { 
-    it('should open the modal', async () => {
-      const { getAllByLabelText } = customRender(<RootPage />)
-      
-      await userEvent.click(getAllByLabelText('options')[0])
-
-      await userEvent.click(getAllByLabelText('info')[0])
-
-      expect(useModalStore.getState().isOpen).toBeTruthy()
-      expect(useModalStore.getState().currentModal?.component).toStrictEqual(CreateUpdateDrawModal)
+      expect(queryByRole('log')).not.toBeInTheDocument()
     })
   })
 })
