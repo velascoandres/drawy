@@ -1,4 +1,3 @@
-import React from 'react'
 import { beforeEach, describe, expect, it, Mock } from 'vitest'
 
 import userEvent from '@testing-library/user-event'
@@ -7,7 +6,7 @@ import ExportFile from '@/modals/ExportFile/ExportFile'
 import { useUpdateDrawMutation } from '@/mutations/drawMutations'
 import { useGetDrawByIdQuery } from '@/queries/drawQueries'
 import useModalStore from '@/store/modal/modalStore'
-import { act, customRender, waitFor } from '@/test-utils/custom-render'
+import { customRender, waitFor } from '@/test-utils/custom-render'
 
 import DrawPage from './DrawPage'
 
