@@ -2,10 +2,10 @@ import React from 'react'
 import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 
 import { 
+  Box,
   Button, 
   Flex, 
   Heading,
-  Image,
   ModalBody, 
   ModalCloseButton, 
   ModalContent, 
@@ -16,23 +16,22 @@ import {
   VStack 
 } from '@chakra-ui/react'
 import { exportToBlob, exportToSvg } from '@excalidraw/excalidraw'
-import type { ExcalidrawElement } from '@excalidraw/excalidraw/types/element/types'
-import type { BinaryFiles } from '@excalidraw/excalidraw/types/types'
+import type { ExcalidrawImperativeAPI } from '@excalidraw/excalidraw/types/types'
 import { save } from '@tauri-apps/api/dialog'
 import { writeBinaryFile } from '@tauri-apps/api/fs'
 import { downloadDir } from '@tauri-apps/api/path'
 
 import RadioGroupHF from '@/components/RadioGroupHF/RadioGroupHF'
 import SwitchHF from '@/components/SwitchHF/SwitchHF'
-import { useGetDrawByIdQuery } from '@/queries/drawQueries'
-import { IDraw } from '@/services/drawService'
+import { IDrawInfo } from '@/services/drawService'
 import useModalStore from '@/store/modal/modalStore'
 
 
 type ExportTarget = 'png' | 'svg' | 'json'
 
 interface IProps {
-    drawId: string
+    drawInfo: IDrawInfo
+    drawApi: ExcalidrawImperativeAPI
 }
 
 interface IExportForm {
@@ -44,64 +43,53 @@ interface IExportForm {
 
 
 const ExportFile = (props: IProps) => {
-  const { drawId } = props   
+  const { drawApi, drawInfo } = props   
 
-  const { data: draw } = useGetDrawByIdQuery(drawId)  
   const { closeModal } = useModalStore()
   const toast = useToast()
 
   const form = useForm<IExportForm>()
 
   const getSvgFile = (config: IExportForm) => {
-    const elements = draw?.scene?.elements as ExcalidrawElement[] | null
-    const files = draw?.scene?.rawFiles as BinaryFiles | null
-
     return exportToSvg({
-      elements: elements || [],
+      elements: drawApi.getSceneElements(),
       appState: {
-        ...(draw?.scene?.appState || {}),
+        ...(drawApi.getAppState() || {}),
         theme: config.withDarkTheme ? 'dark' : 'light',
         exportWithDarkMode: config.withDarkTheme,
         exportBackground: config.withBackground,
         exportEmbedScene: config.withEmbebScene,
         exportScale: 1
       },
-      files
+      files: drawApi.getFiles()
     })
   }
 
   const getPngFile = (config: IExportForm) => {
-    const elements = draw?.scene?.elements as ExcalidrawElement[] | null
-    const files = draw?.scene?.rawFiles as BinaryFiles | null
-
     return exportToBlob({
-      elements: elements || [],
+      elements: drawApi.getSceneElements(),
       mimeType: 'image/png',
       appState: {
-        ...(draw?.scene?.appState || {}),
+        ...(drawApi.getAppState() || {}),
         theme: config.withDarkTheme ? 'dark' : 'light',
         exportWithDarkMode: config.withDarkTheme,
         exportBackground: config.withBackground,
         exportEmbedScene: config.withEmbebScene,
         exportScale: 1
       },
-      files
+      files: drawApi.getFiles()
     })
   }
 
   const getJSONBlobFile = (config: IExportForm) => {
-    const elements = draw?.scene?.elements as ExcalidrawElement[] | null
-    const files = draw?.scene?.rawFiles as BinaryFiles | null
-
-
     const str = JSON.stringify({
-      elements: elements || [],
+      elements: drawApi.getSceneElements(),
       mimeType: 'image/png',
       appState: {
-        ...(draw?.scene?.appState || {}),
+        ...(drawApi.getAppState() || {}),
         theme: config.withDarkTheme ? 'dark' : 'light',
       },
-      files
+      files: drawApi.getFiles()
     })
     const bytes = new TextEncoder().encode(str)
 
@@ -113,10 +101,6 @@ const ExportFile = (props: IProps) => {
   }
 
   const handleExport = async (config: IExportForm) => {
-    if (!draw) {
-      return
-    }
-
     try {
       const saveHandlers: Record<ExportTarget, (config: IExportForm) => Promise<SVGElement | Blob>> = {
         svg: getSvgFile,
@@ -130,7 +114,7 @@ const ExportFile = (props: IProps) => {
       const downloadsPath = await downloadDir()
 
       const path = await save({
-        defaultPath: `${downloadsPath}/${draw.name.replace(' ', '-')}.${config.target}`,
+        defaultPath: `${downloadsPath}/${drawInfo.name.replace(' ', '-')}.${config.target}`,
       })
 
 
@@ -180,7 +164,7 @@ const ExportFile = (props: IProps) => {
                 Preview:
               </Heading>
               {
-                draw && (<ExportPreview draw={draw} />)
+                <ExportPreview drawApi={drawApi} />
               }        
               <Flex direction="row" gap={8} width="100%">
                 <Flex direction="column">
@@ -198,7 +182,7 @@ const ExportFile = (props: IProps) => {
                   <Heading as='h5' size="md">
                     Options:
                   </Heading>
-                  {/* <SwitchHF label="Export with dark mode:" name="withDarkTheme" value={false} /> */}
+                  <SwitchHF label="Export with dark mode:" name="withDarkTheme" value={false} />
                   <SwitchHF label="Export with embed scene:" name="withEmbebScene" value={false} />
                   <SwitchHF label="Mantain background:" name="withBackground" value={false} />  
                 </Flex>
@@ -221,12 +205,12 @@ const ExportFile = (props: IProps) => {
 }
 
 interface IPreviewProps {
-  draw: IDraw 
+  drawApi: ExcalidrawImperativeAPI 
 }
 
 const ExportPreview = (props: IPreviewProps) => {
-  const { draw } = props
-  const [exportPreview, setExportPreview] = React.useState<string>('')
+  const { drawApi } = props
+  const [exportPreview, setExportPreview] = React.useState<SVGSVGElement>()
 
   const { watch } = useFormContext<IExportForm>()
 
@@ -235,36 +219,33 @@ const ExportPreview = (props: IPreviewProps) => {
   const watchWithEmbebScene = watch('withEmbebScene')
 
   React.useEffect(() => {
-    const elements = draw?.scene?.elements as ExcalidrawElement[] | null
-    const files = draw?.scene?.rawFiles as BinaryFiles | null
-
-    exportToBlob({
-      elements: elements || [],
-      mimeType: 'image/png',
+    exportToSvg({
+      elements: drawApi.getSceneElements(),
       appState: {
-        ...(draw?.scene?.appState || {}),
+        ...drawApi.getAppState(),
         exportWithDarkMode: watchWithDarkTheme,
         exportBackground: watchWithBackground,
         exportEmbedScene: watchWithEmbebScene,
         theme: watchWithDarkTheme ? 'dark' : 'light',
-        exportScale: 0.1,
+        exportScale: 0.3,
       },
-      files
+      files: drawApi.getFiles()
     }).then((file) => {
-      const reader = new FileReader()
-
-      reader.readAsDataURL(file) 
-      reader.onloadend = () => {
-        const base64data = reader.result as string          
-
-        setExportPreview(base64data)
-      }
+      setExportPreview(file)
     })
-  }, [watchWithEmbebScene, watchWithDarkTheme, watchWithBackground, draw])
+  }, [watchWithEmbebScene, watchWithDarkTheme, watchWithBackground, drawApi])
 
   return (
     <Flex direction="row" justifyContent="center" width="100%">
-      <Image width="300px" src={exportPreview} alt={draw?.name} />
+      {
+        exportPreview && (
+          <Box 
+            background={watchWithDarkTheme ? 'black' : 'transparent'} 
+            role="img"
+            dangerouslySetInnerHTML={{ __html: exportPreview.outerHTML }} 
+          />
+        )
+      }   
     </Flex>
   )
 }

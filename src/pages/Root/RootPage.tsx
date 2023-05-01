@@ -32,11 +32,13 @@ import { IDrawInfoQuery } from '@/services/drawService'
 import useModalStore from '@/store/modal/modalStore'
 
 const SMALL_HEIGHT = 300
-const MEDIUM_HEIGHT = 650
+const MEDIUM_HEIGHT = 645
+const LARGE_HEIGHT = 950
 
 const QUARTER_SCALE_FACTOR = 0.25
-const MEDIUM_SCALE_FACTOR = 0.5
-const STANDARD_SCALE_FACTOR = 0.72
+const MEDIUM_SCALE_FACTOR = 0.50
+const STANDARD_SCALE_FACTOR = 0.70
+const LARGE_SCALE_FACTOR = 0.75
 
 const RootPage = () => {
   const { isOpen, onClose, onOpen } = useDisclosure()
@@ -78,15 +80,19 @@ const RootPage = () => {
   }
 
   const listHeight = React.useMemo(() => {
-    if (height < SMALL_HEIGHT) {
+    if (height <= SMALL_HEIGHT) {
       return height * QUARTER_SCALE_FACTOR
     }
     
-    if (height < MEDIUM_HEIGHT) {
+    if (height <= MEDIUM_HEIGHT) {
       return height * MEDIUM_SCALE_FACTOR
     }
 
-    return height * STANDARD_SCALE_FACTOR
+    if (height <= LARGE_HEIGHT) {
+      return height * STANDARD_SCALE_FACTOR
+    }
+
+    return height * LARGE_SCALE_FACTOR
       
   }, [height])
 
@@ -201,9 +207,9 @@ const RootPage = () => {
       <Box ml={{ base: 0, md: 60 }} p="4">
         <Outlet />
       </Box>
-      {
-        !isMobile && <StatusBar />
-      }
+      <Box display={{ md: 'none', lg: 'block', sm: 'none' }}>
+        {!isMobile && <StatusBar />}
+      </Box>
     </Box>
   )
 }

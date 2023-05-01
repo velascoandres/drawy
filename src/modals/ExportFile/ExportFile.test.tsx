@@ -1,5 +1,6 @@
 import { describe, it, Mock, vi } from 'vitest'
 
+import { ExcalidrawImperativeAPI } from '@excalidraw/excalidraw/types/types'
 import { save } from '@tauri-apps/api/dialog'
 import { downloadDir } from '@tauri-apps/api/path'
 import userEvent from '@testing-library/user-event'
@@ -26,6 +27,12 @@ const getDrawByIdQueryMock = useGetDrawByIdQuery as Mock
 const saveMock = save as Mock
 const downloadDirMock = downloadDir as Mock
 
+const drawApiMock = {
+  getSceneElements: () => testDraw.scene?.elements,
+  getAppState: () => (testDraw.scene?.appState),
+  getFiles: () => ({})
+} as unknown as ExcalidrawImperativeAPI
+
 describe('<ExportFile /> tests', () => { 
   beforeEach(() => {
     getDrawByIdQueryMock.mockReturnValue({ data: testDraw })
@@ -35,7 +42,7 @@ describe('<ExportFile /> tests', () => {
 
   describe('When render', () => { 
     it('should render', () => {
-      const { getByText } = customRenderModal(<ExportFile drawId={testDraw.id} />)
+      const { getByText } = customRenderModal(<ExportFile drawInfo={testDraw} drawApi={drawApiMock} />)
     
       expect(getByText('Export draw')).toBeInTheDocument()
       expect(getByText('Select the target:')).toBeInTheDocument()
@@ -43,17 +50,11 @@ describe('<ExportFile /> tests', () => {
       expect(getByText('PNG')).toBeInTheDocument()
       expect(getByText('JSON')).toBeInTheDocument()
     })
-  
-    it('should show image preview', () => {
-      const { getByAltText } = customRenderModal(<ExportFile drawId={testDraw.id} />)
-    
-      expect(getByAltText('test draw')).toBeInTheDocument()
-    })
   })
 
   describe('When export file', () => { 
     it('should export to svg file', async () => {
-      const { getByText } = customRenderModal(<ExportFile drawId={testDraw.id} />)
+      const { getByText } = customRenderModal(<ExportFile drawInfo={testDraw} drawApi={drawApiMock} />)
 
       await userEvent.click(getByText('SVG'))
 
@@ -66,7 +67,7 @@ describe('<ExportFile /> tests', () => {
     })
 
     it('should export to png file', async () => {
-      const { getByText } = customRenderModal(<ExportFile drawId={testDraw.id} />)
+      const { getByText } = customRenderModal(<ExportFile drawInfo={testDraw} drawApi={drawApiMock} />)
 
       await userEvent.click(getByText('PNG'))
 
@@ -78,7 +79,7 @@ describe('<ExportFile /> tests', () => {
     })
 
     it('should export to png file', async () => {
-      const { getByText } = customRenderModal(<ExportFile drawId={testDraw.id} />)
+      const { getByText } = customRenderModal(<ExportFile drawInfo={testDraw} drawApi={drawApiMock} />)
 
       await userEvent.click(getByText('JSON'))
 

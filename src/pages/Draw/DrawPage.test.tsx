@@ -7,7 +7,7 @@ import ExportFile from '@/modals/ExportFile/ExportFile'
 import { useUpdateDrawMutation } from '@/mutations/drawMutations'
 import { useGetDrawByIdQuery } from '@/queries/drawQueries'
 import useModalStore from '@/store/modal/modalStore'
-import { customRender } from '@/test-utils/custom-render'
+import { act, customRender, waitFor } from '@/test-utils/custom-render'
 
 import DrawPage from './DrawPage'
 
@@ -18,11 +18,6 @@ vi.mock('react-router-dom', () => ({
 
 vi.mock('@/queries/drawQueries')
 vi.mock('@/mutations/drawMutations')
-
-vi.mock('@excalidraw/excalidraw', () => ({
-  // eslint-disable-next-line react/display-name
-  Excalidraw: React.forwardRef(({ children }: { children: React.ReactNode }) => <div>{children}</div>),
-}))
 
 const updateDrawMock = vi.fn()
 
@@ -37,25 +32,33 @@ describe('<DrawPage /> tests', () => {
   })
 
   describe('When renders', () => { 
-    it('should show export button', () => {
+    it('should show export button', async () => {
       const { getByText } = customRender(<DrawPage />)
     
-      expect(getByText('Export')).toBeInTheDocument()
+      await waitFor(() => {
+        expect(getByText('Export')).toBeInTheDocument()
+      })
     })
 
     it('should show open ExportFile modal', async () => {
       const { getByText } = customRender(<DrawPage />)
-    
-      await userEvent.click(getByText('Export'))
 
-      expect(useModalStore.getState().isOpen).toBeTruthy()
-      expect(useModalStore.getState().currentModal?.component).toStrictEqual(ExportFile) 
+      await waitFor(async () => {
+        await userEvent.click(getByText('Export'))
+      })
+
+      await waitFor(() => {
+        expect(useModalStore.getState().isOpen).toBeTruthy()
+        expect(useModalStore.getState().currentModal?.component).toStrictEqual(ExportFile) 
+      })
     })
 
-    it('should show draw name', () => {
+    it('should show draw name', async () => {
       const { getByText } = customRender(<DrawPage />)
     
-      expect(getByText('Draw name test')).toBeInTheDocument()
+      await waitFor(() => {
+        expect(getByText('Draw name test')).toBeInTheDocument()
+      })
     })
   })
 })

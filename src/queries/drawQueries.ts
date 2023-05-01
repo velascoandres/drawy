@@ -21,7 +21,7 @@ export const useGetDrawByIdQuery = (id: string) => {
   return useQuery({
     queryKey: ['draw', id],
     enabled: Boolean(id),
-    cacheTime: 0,
+    cacheTime: 1,
     select: (data): IDraw | null => {
       if (!data) {
         return null
@@ -30,6 +30,7 @@ export const useGetDrawByIdQuery = (id: string) => {
       return {
         id:  data.id,
         name: data.name,
+        description: data.description,
         scene: data?.raw_elements ? JSON.parse(data?.raw_elements) : undefined
       } 
     },

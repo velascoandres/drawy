@@ -3,6 +3,7 @@ import { invoke } from '@tauri-apps/api'
 export interface IDraw {
     id: string
     name: string
+    description?: string
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     scene?: Record<string, any>
 }
@@ -10,6 +11,7 @@ export interface IDraw {
 export interface IRawDraw {
   id: string
   name: string
+  description: string
   raw_elements?: string
 }
 

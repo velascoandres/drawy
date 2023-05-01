@@ -94,20 +94,33 @@ const DrawPage = () => {
       return
     }
 
+    if (!excalidrawAPI) {
+      return
+    }
+
     openModal({
       component: ExportFile,
       props: {
-        drawId: draw.id,
+        drawInfo: { id: draw.name, name: draw.name, description: draw.description },
+        drawApi: excalidrawAPI
       },
     })
   }
 
   React.useEffect(() => {
-    if (!(draw?.scene && !hasLoadedDrawRef.current && excalidrawAPI)) {
+    if (!excalidrawAPI) {
       return
     }
 
-    const files = draw.scene.files as BinaryFileData[] 
+    if (hasLoadedDrawRef.current) {
+      return
+    }
+
+    if (!draw?.scene) {
+      return
+    }
+
+    const files = draw.scene?.files as BinaryFileData[] 
 
     if (files?.length) {
       excalidrawAPI.addFiles(draw.scene.files as BinaryFileData[])
@@ -131,14 +144,14 @@ const DrawPage = () => {
     form.setValue('grid', hasGrid)
   }, [draw?.scene, form])
 
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     hasLoadedDrawRef.current = false
     excalidrawAPI?.resetScene()
   }, [params.drawId, excalidrawAPI])
 
   return (
-    <Flex align="start" direction="column">
-      <Flex direction="row" justifyContent="start" alignItems="center" gap={2}>
+    <Flex align="start" direction="column" gap={2}>
+      <Flex direction="row" justifyContent="start" alignItems="center" gap={1}>
         <Heading as="h3" size="lg" cursor="pointer" >
           {draw?.name}
         </Heading>
@@ -147,17 +160,19 @@ const DrawPage = () => {
             Export
         </Button>
       </Flex>
+      <Divider background="black" />
       <FormProvider {...form}>
-        <Flex direction="row" justifyContent="start" gap={0} width="25%">
+        <Flex direction="column" justifyContent="start" gap={0}>
           <SwitchHF label="Dark mode:" name="darkMode" justifyContent="start" />
           <SwitchHF label="Enable grid:" name="grid" justifyContent="start" />
         </Flex> 
       </FormProvider>
-      <Divider orientation="horizontal" />
       <Box position="relative" width="100%">
-        <Box height="-webkit-fill-available" width="100%" position="absolute" paddingY={8}>
+        <Box height="-webkit-fill-available" width="100%" position="absolute" paddingBottom={16}>
           <Excalidraw
-            ref={(api: ExcalidrawImperativeAPI) => setExcalidrawAPI(api)}
+            ref={(api: ExcalidrawImperativeAPI) => {
+              setExcalidrawAPI(api)
+            }}
             // eslint-disable-next-line max-params
             onChange={(elements, appState, files) => {
               debounceUpdateScene(() => handleChange([...elements], appState, files))
