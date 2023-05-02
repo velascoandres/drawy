@@ -45,7 +45,8 @@
       "icon": [
         "icons/icon.png",
         "icons/icon.icns",
-        "icons/icon.ico"
+        "icons/icon.ico",
+        "icons/100x100.png"
       ],
       "identifier": "com.drawy",
       "longDescription": "",
