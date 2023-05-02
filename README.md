@@ -3,7 +3,7 @@
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
 
-A small desktop application made with Tauri to save whiteboards made with excalidraw locally
+A small desktop application made with Tauri to save excalidraw whiteboards locally
 
 
 ## Used technologies
