@@ -15,6 +15,8 @@ A small desktop application made with Tauri to save whiteboards made with excali
 - Typescript
 - React-Query
 - Eslint
+- React Hook Form
+- Yup form validator
 
 ## Setup
 
