@@ -33,7 +33,7 @@ pnpm i
 
 Run diesel migrations
 ```
-diesel run migrations
+diesel run migration
 ```
 
 Run Tauri app
