@@ -11,6 +11,7 @@ fn main() {
         conn: Mutex::new(db::establish_connection())
     };
 
+
     tauri::Builder::default()
         .manage(state)
         .invoke_handler(tauri::generate_handler![

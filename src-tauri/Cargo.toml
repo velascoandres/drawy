@@ -21,6 +21,7 @@ tauri = { version = "1.2.4", features = ["dialog-all", "fs-exists", "fs-remove-f
 chrono = "0.4.24"
 diesel = {version = "2.0.3", features = ["sqlite", "chrono"] }
 libmath = "0.2.1"
+diesel_migrations = "2.0.0"
 
 [dependencies.rusqlite]
 version = "0.29.0"
