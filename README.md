@@ -43,7 +43,6 @@ pnpm tauri dev
 
 ### Screenshots
 
-![image](https://user-images.githubusercontent.com/12194462/235583175-50ff5296-3944-4a8c-bd84-56b32edd153a.png)
-
+![image](https://user-images.githubusercontent.com/12194462/235833078-2676f3d2-dce3-4924-a49a-74bc99afc5ab.png)
 
 
