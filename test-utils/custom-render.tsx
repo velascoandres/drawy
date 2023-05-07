@@ -1,6 +1,6 @@
 import { afterEach, vi } from 'vitest'
 
-import { ChakraProvider, Modal } from '@chakra-ui/react'
+import { ChakraProvider, Drawer } from '@chakra-ui/react'
 import { cleanup, render } from '@testing-library/react'
 
 afterEach(() => {
@@ -19,7 +19,7 @@ const customRender = (ui: React.ReactElement, options = {}) =>
 
 const customRenderModal = (ui: React.ReactElement, options = {}) =>
   render(ui, {
-    wrapper: ({ children }) => <ChakraProvider><Modal isOpen onClose={vi.fn()}> {children} </Modal></ChakraProvider>,
+    wrapper: ({ children }) => <ChakraProvider><Drawer isOpen onClose={vi.fn()}> {children} </Drawer></ChakraProvider>,
     ...options,
   })  
 

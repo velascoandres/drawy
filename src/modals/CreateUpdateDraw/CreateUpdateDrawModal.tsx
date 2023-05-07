@@ -8,13 +8,13 @@ import * as yup from 'yup'
 
 import { 
   Button, 
+  DrawerBody, 
+  DrawerCloseButton, 
+  DrawerContent, 
+  DrawerFooter, 
+  DrawerHeader, 
   Flex, 
   IconButton, 
-  ModalBody, 
-  ModalCloseButton, 
-  ModalContent, 
-  ModalFooter, 
-  ModalHeader,
   useToast, 
 } from '@chakra-ui/react'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -99,80 +99,83 @@ const CreateUpdateDrawModal = ({ draw }: IProps) => {
   }, [closeModal, isUpdateSuccess, toast])
   
   return (
-    <ModalContent>
-      {
-        showDrawInfo ? (
-          <>
-            <ModalHeader>
+    <form onSubmit={form.handleSubmit(onSubmit)}>
+      <DrawerContent>
+        {
+          showDrawInfo ? (
+            <>
+              <DrawerHeader borderBottomWidth="1px">
                 Draw information
-              <IconButton 
-                aria-label="toogle-edit" 
-                onClick={toggleShow} 
-                icon={<FiEdit />}
-                background="white" 
-                _hover={{
-                  bg: 'white',
-                }} 
-              />
-            </ModalHeader>
-            <ModalBody>
-              <ModalCloseButton />
-              <DrawInfo draw={draw as IDrawInfo} />
-            </ModalBody>
-            <ModalFooter gap={2}>
-              <Button variant="ghost" onClick={closeModal}>Close</Button>
-            </ModalFooter>
-          </>
-        ) : (
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <ModalHeader>
-              {draw ? 'Edit Draw' : 'Create a new Draw'}
-              {draw && (
-                <IconButton
+                <IconButton 
+                  aria-label="toogle-edit" 
+                  onClick={toggleShow} 
+                  icon={<FiEdit />}
                   background="white" 
                   _hover={{
                     bg: 'white',
-                  }}
-                  aria-label="toogle-info" 
-                  onClick={toggleShow} 
-                  icon={<FiInfo />} 
+                  }} 
                 />
-              )}
-            </ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <FormProvider {...form}>
-                <Flex direction="column" gap={2}>
-                  <InputHF 
-                    name="name" 
-                    label="Name"
-                    inputProps={{ placeholder: 'Write a name for your draw' }} 
-                    helperText="Type a draw name"
+              </DrawerHeader>
+              <DrawerBody>
+                <DrawerCloseButton />
+                <DrawInfo draw={draw as IDrawInfo} />
+              </DrawerBody>
+              <DrawerFooter gap={2}>
+                <Button variant="ghost" onClick={closeModal}>Close</Button>
+              </DrawerFooter>
+            </>
+          ) : (
+            <>
+
+              <DrawerHeader borderBottomWidth="1px">
+                {draw ? 'Edit Draw' : 'Create a new Draw'}
+                {draw && (
+                  <IconButton
+                    background="white" 
+                    _hover={{
+                      bg: 'white',
+                    }}
+                    aria-label="toogle-info" 
+                    onClick={toggleShow} 
+                    icon={<FiInfo />} 
                   />
-                  <TextareaHF
-                    name="description" 
-                    label="Description"
-                    textareaProps={{ placeholder: 'Write a full description for your draw' }}
-                    helperText="Provide a complete description for the draw"
-                  />
-                </Flex>
+                )}
+              </DrawerHeader>
+              <DrawerCloseButton />
+              <DrawerBody>
+                <FormProvider {...form}>
+                  <Flex direction="column" gap={2}>
+                    <InputHF 
+                      name="name" 
+                      label="Name"
+                      inputProps={{ placeholder: 'Write a name for your draw' }} 
+                      helperText="Type a draw name"
+                    />
+                    <TextareaHF
+                      name="description" 
+                      label="Description"
+                      textareaProps={{ placeholder: 'Write a full description for your draw' }}
+                      helperText="Provide a complete description for the draw"
+                    />
+                  </Flex>
             
-              </FormProvider>
-            </ModalBody>
-            <ModalFooter gap={2}>
-              <Button 
-                variant="solid" 
-                colorScheme="messenger" 
-                type="submit"
-              >
-                {draw ? 'Update' : 'Create'}
-              </Button>
-              <Button variant="ghost" onClick={closeModal}>Cancel</Button>
-            </ModalFooter>
-          </form>
-        )
-      }
-    </ModalContent>
+                </FormProvider>
+              </DrawerBody>
+              <DrawerFooter gap={2}>
+                <Button 
+                  variant="solid" 
+                  colorScheme="messenger" 
+                  type="submit"
+                >
+                  {draw ? 'Update' : 'Create'}
+                </Button>
+                <Button variant="ghost" onClick={closeModal}>Cancel</Button>
+              </DrawerFooter>
+            </>
+          )
+        }
+      </DrawerContent>
+    </form>
   )
 }
 

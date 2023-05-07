@@ -4,13 +4,13 @@ import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 import { 
   Box,
   Button, 
+  DrawerBody, 
+  DrawerCloseButton, 
+  DrawerContent, 
+  DrawerFooter, 
+  DrawerHeader, 
   Flex, 
   Heading,
-  ModalBody, 
-  ModalCloseButton, 
-  ModalContent, 
-  ModalFooter, 
-  ModalHeader, 
   Radio, 
   useToast, 
   VStack 
@@ -153,12 +153,12 @@ const ExportFile = (props: IProps) => {
   }
 
   return (
-    <ModalContent>
-      <form onSubmit={form.handleSubmit(handleExport)}>
+    <form onSubmit={form.handleSubmit(handleExport)}>
+      <DrawerContent>
         <FormProvider {...form}>
-          <ModalHeader>Export draw</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
+          <DrawerHeader borderBottomWidth="1px">Export draw</DrawerHeader>
+          <DrawerCloseButton />
+          <DrawerBody>
             <VStack direction="column" alignItems="start" gap={2}>
               <Heading as='h4' size='md'>
                 Preview:
@@ -189,18 +189,18 @@ const ExportFile = (props: IProps) => {
               </Flex>   
             </VStack>
 
-          </ModalBody>
-          <ModalFooter>
+          </DrawerBody>
+          <DrawerFooter>
             <Button colorScheme="blue" mr={3} type="submit">
               Export
             </Button>
             <Button variant='ghost' onClick={closeModal}>
             Cancel
             </Button>
-          </ModalFooter>
+          </DrawerFooter>
         </FormProvider>
-      </form>
-    </ModalContent>
+      </DrawerContent>
+    </form>
   )
 }
 
@@ -227,7 +227,7 @@ const ExportPreview = (props: IPreviewProps) => {
         exportBackground: watchWithBackground,
         exportEmbedScene: watchWithEmbebScene,
         theme: watchWithDarkTheme ? 'dark' : 'light',
-        exportScale: 0.3,
+        exportScale: 0.5,
       },
       files: drawApi.getFiles()
     }).then((file) => {

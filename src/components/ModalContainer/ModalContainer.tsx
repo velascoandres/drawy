@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Modal, ModalOverlay } from '@chakra-ui/react'
+import { Drawer, DrawerOverlay } from '@chakra-ui/react'
 
 import useModalStore from '@/store/modal/modalStore'
 
@@ -25,16 +25,16 @@ const ModalContainer = () => {
   }
 
   return (
-    <Modal 
+    <Drawer 
       isOpen={isOpen} 
       onClose={closeModal}
       closeOnEsc={currentModal?.config?.closeOnEscapeKeydown}
       closeOnOverlayClick={currentModal?.config?.closeOnClickOutside}
-      size="2xl"
+      size="md"
     >
-      <ModalOverlay aria-label="overlay" />
+      <DrawerOverlay aria-label="overlay" />
       {renderModal()}
-    </Modal>
+    </Drawer>
   )
 }
 

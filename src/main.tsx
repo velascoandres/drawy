@@ -18,6 +18,15 @@ const router = createBrowserRouter(ROUTES)
 
 const queryClient = new QueryClient()
 
+const disableContextMenu = () => {
+  if (window.location.hostname !== 'tauri.localhost') {
+    return
+  }
+  document.addEventListener('contextmenu', event => event.preventDefault())
+}
+
+disableContextMenu()
+
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <>
     <QueryClientProvider client={queryClient}>
