@@ -32,18 +32,18 @@ describe('<DrawPage /> tests', () => {
 
   describe('When renders', () => { 
     it('should show export button', async () => {
-      const { getByText } = customRender(<DrawPage />)
+      const { getByLabelText } = customRender(<DrawPage />)
     
       await waitFor(() => {
-        expect(getByText('Export')).toBeInTheDocument()
+        expect(getByLabelText('export')).toBeInTheDocument()
       })
     })
 
     it('should show open ExportFile modal', async () => {
-      const { getByText } = customRender(<DrawPage />)
+      const { getByLabelText } = customRender(<DrawPage />)
 
       await waitFor(async () => {
-        await userEvent.click(getByText('Export'))
+        await userEvent.click(getByLabelText('export'))
       })
 
       await waitFor(() => {

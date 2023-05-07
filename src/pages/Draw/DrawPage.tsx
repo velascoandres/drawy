@@ -5,12 +5,12 @@ import { useParams } from 'react-router-dom'
 
 import { 
   Box,
-  Button,
   Divider, 
   Flex, 
   Heading,
+  IconButton,
 } from '@chakra-ui/react'
-import { Excalidraw } from '@excalidraw/excalidraw'
+import { Excalidraw, MainMenu } from '@excalidraw/excalidraw'
 import {
   AppState,
   BinaryFileData,
@@ -152,13 +152,10 @@ const DrawPage = () => {
   return (
     <Flex align="start" direction="column" gap={2}>
       <Flex direction="row" justifyContent="start" alignItems="center" gap={1}>
+        <IconButton icon={<FiDownload />} onClick={openExportModal} aria-label="export" />
         <Heading as="h3" size="lg" cursor="pointer" >
           {draw?.name}
         </Heading>
-        
-        <Button leftIcon={<FiDownload />} onClick={openExportModal}>
-            Export
-        </Button>
       </Flex>
       <Divider background="black" />
       <FormProvider {...form}>
@@ -180,9 +177,13 @@ const DrawPage = () => {
             viewModeEnabled={false}
             gridModeEnabled={form.watch('grid')}
             theme={form.watch('darkMode') ? 'dark' : 'light'}
-            name="Custom name of drawing"
+            name={draw?.name}
             UIOptions={{ canvasActions: { loadScene: false } }}
-          />
+          >
+            <MainMenu>
+              <MainMenu.DefaultItems.ChangeCanvasBackground />
+            </MainMenu>
+          </Excalidraw>
         </Box>
       </Box>
     </Flex>
