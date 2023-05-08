@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "tauri": "tauri",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "vitest --watch false",
