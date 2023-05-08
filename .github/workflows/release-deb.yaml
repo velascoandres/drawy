@@ -39,6 +39,7 @@ jobs:
 
       - name: Sync node version and setup cache
         uses: actions/setup-node@v3
+      - name: Use pnpm  
         uses: pnpm/action-setup@v2
         with:
           node-version: 'lts/*'
