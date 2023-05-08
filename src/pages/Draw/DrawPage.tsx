@@ -21,12 +21,14 @@ import {
 import SwitchHF from '@/components/SwitchHF/SwitchHF'
 import initialData from '@/constants/initial-data'
 import useDebounceCallback from '@/hooks/useDebounceCallback'
+import useWindowSize from '@/hooks/useWindowSize'
 import ExportFile from '@/modals/ExportFile/ExportFile'
 import { useUpdateDrawMutation } from '@/mutations/drawMutations'
 import { useGetDrawByIdQuery } from '@/queries/drawQueries'
 import useModalStore from '@/store/modal/modalStore'
 
 const UPDATE_SCENE_DEBOUNCE = 1000
+const HEIGHT_DELTA = 100
 
 interface IDrawUIStatus {
   darkMode: boolean
@@ -37,6 +39,7 @@ const DrawPage = () => {
   const params = useParams()
   const { data: draw } = useGetDrawByIdQuery(params.drawId as string)
   const { mutate: updateDraw } = useUpdateDrawMutation()
+  const { height } = useWindowSize()
 
   const { openModal } = useModalStore()
 
@@ -132,6 +135,11 @@ const DrawPage = () => {
   
   }, [draw?.scene, excalidrawAPI])
 
+  const canvasWrapperHeight = React.useMemo(
+    () => height - HEIGHT_DELTA, 
+    [height]
+  )
+
   React.useEffect(() => {
     if (!draw?.scene) {
       return
@@ -165,7 +173,7 @@ const DrawPage = () => {
         </Flex> 
       </FormProvider>
       <Box position="relative" width="100%">
-        <Box height="-webkit-fill-available" width="100%" position="absolute" paddingBottom={16}>
+        <Box height={canvasWrapperHeight} width="100%" position="absolute" paddingBottom={16}>
           <Excalidraw
             ref={(api: ExcalidrawImperativeAPI) => {
               setExcalidrawAPI(api)
