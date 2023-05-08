@@ -5,12 +5,12 @@ import { useParams } from 'react-router-dom'
 
 import { 
   Box,
-  Button,
   Divider, 
   Flex, 
   Heading,
+  IconButton,
 } from '@chakra-ui/react'
-import { Excalidraw } from '@excalidraw/excalidraw'
+import { Excalidraw, MainMenu } from '@excalidraw/excalidraw'
 import {
   AppState,
   BinaryFileData,
@@ -21,12 +21,14 @@ import {
 import SwitchHF from '@/components/SwitchHF/SwitchHF'
 import initialData from '@/constants/initial-data'
 import useDebounceCallback from '@/hooks/useDebounceCallback'
+import useWindowSize from '@/hooks/useWindowSize'
 import ExportFile from '@/modals/ExportFile/ExportFile'
 import { useUpdateDrawMutation } from '@/mutations/drawMutations'
 import { useGetDrawByIdQuery } from '@/queries/drawQueries'
 import useModalStore from '@/store/modal/modalStore'
 
 const UPDATE_SCENE_DEBOUNCE = 1000
+const HEIGHT_DELTA = 100
 
 interface IDrawUIStatus {
   darkMode: boolean
@@ -37,6 +39,7 @@ const DrawPage = () => {
   const params = useParams()
   const { data: draw } = useGetDrawByIdQuery(params.drawId as string)
   const { mutate: updateDraw } = useUpdateDrawMutation()
+  const { height } = useWindowSize()
 
   const { openModal } = useModalStore()
 
@@ -132,6 +135,11 @@ const DrawPage = () => {
   
   }, [draw?.scene, excalidrawAPI])
 
+  const canvasWrapperHeight = React.useMemo(
+    () => height - HEIGHT_DELTA, 
+    [height]
+  )
+
   React.useEffect(() => {
     if (!draw?.scene) {
       return
@@ -152,13 +160,10 @@ const DrawPage = () => {
   return (
     <Flex align="start" direction="column" gap={2}>
       <Flex direction="row" justifyContent="start" alignItems="center" gap={1}>
+        <IconButton icon={<FiDownload />} onClick={openExportModal} aria-label="export" />
         <Heading as="h3" size="lg" cursor="pointer" >
           {draw?.name}
         </Heading>
-        
-        <Button leftIcon={<FiDownload />} onClick={openExportModal}>
-            Export
-        </Button>
       </Flex>
       <Divider background="black" />
       <FormProvider {...form}>
@@ -168,7 +173,7 @@ const DrawPage = () => {
         </Flex> 
       </FormProvider>
       <Box position="relative" width="100%">
-        <Box height="-webkit-fill-available" width="100%" position="absolute" paddingBottom={16}>
+        <Box height={canvasWrapperHeight} width="100%" position="absolute" paddingBottom={16}>
           <Excalidraw
             ref={(api: ExcalidrawImperativeAPI) => {
               setExcalidrawAPI(api)
@@ -180,9 +185,13 @@ const DrawPage = () => {
             viewModeEnabled={false}
             gridModeEnabled={form.watch('grid')}
             theme={form.watch('darkMode') ? 'dark' : 'light'}
-            name="Custom name of drawing"
+            name={draw?.name}
             UIOptions={{ canvasActions: { loadScene: false } }}
-          />
+          >
+            <MainMenu>
+              <MainMenu.DefaultItems.ChangeCanvasBackground />
+            </MainMenu>
+          </Excalidraw>
         </Box>
       </Box>
     </Flex>

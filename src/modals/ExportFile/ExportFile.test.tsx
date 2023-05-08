@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event'
 import initialData from '@/constants/initial-data'
 import { useGetDrawByIdQuery } from '@/queries/drawQueries'
 import { IDraw } from '@/services/drawService'
-import { customRenderModal } from '@/test-utils/custom-render'
+import { customRenderModal, waitFor } from '@/test-utils/custom-render'
 
 import ExportFile from './ExportFile'
 
@@ -41,14 +41,16 @@ describe('<ExportFile /> tests', () => {
   })
 
   describe('When render', () => { 
-    it('should render', () => {
+    it('should render', async () => {
       const { getByText } = customRenderModal(<ExportFile drawInfo={testDraw} drawApi={drawApiMock} />)
     
-      expect(getByText('Export draw')).toBeInTheDocument()
-      expect(getByText('Select the target:')).toBeInTheDocument()
-      expect(getByText('SVG')).toBeInTheDocument()
-      expect(getByText('PNG')).toBeInTheDocument()
-      expect(getByText('JSON')).toBeInTheDocument()
+      await waitFor(() => {
+        expect(getByText('Export draw')).toBeInTheDocument()
+        expect(getByText('Select the target:')).toBeInTheDocument()
+        expect(getByText('SVG')).toBeInTheDocument()
+        expect(getByText('PNG')).toBeInTheDocument()
+        expect(getByText('JSON')).toBeInTheDocument()
+      })
     })
   })
 
