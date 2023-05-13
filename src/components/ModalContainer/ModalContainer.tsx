@@ -30,7 +30,7 @@ const ModalContainer = () => {
       onClose={closeModal}
       closeOnEsc={currentModal?.config?.closeOnEscapeKeydown}
       closeOnOverlayClick={currentModal?.config?.closeOnClickOutside}
-      size="md"
+      size={currentModal?.config?.size || 'md'}
     >
       <DrawerOverlay aria-label="overlay" />
       {renderModal()}

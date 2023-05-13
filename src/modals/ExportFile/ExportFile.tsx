@@ -12,6 +12,7 @@ import {
   Flex, 
   Heading,
   Radio, 
+  useColorModeValue, 
   useToast, 
   VStack 
 } from '@chakra-ui/react'
@@ -28,7 +29,6 @@ import useModalStore from '@/store/modal/modalStore'
 
 
 type ExportTarget = 'png' | 'svg' | 'json'
-
 interface IProps {
     drawInfo: IDrawInfo
     drawApi: ExcalidrawImperativeAPI
@@ -159,17 +159,11 @@ const ExportFile = (props: IProps) => {
           <DrawerHeader borderBottomWidth="1px">Export draw</DrawerHeader>
           <DrawerCloseButton />
           <DrawerBody>
-            <VStack direction="column" alignItems="start" gap={2}>
-              <Heading as='h4' size='md'>
-                Preview:
-              </Heading>
-              {
-                <ExportPreview drawApi={drawApi} />
-              }        
+            <VStack direction="column" alignItems="start" gap={2}>        
               <Flex direction="row" gap={8} width="100%">
-                <Flex direction="column">
-                  <Heading as='h5' size="md">
-                    Select the target:
+                <Flex direction="column" gap={2}>
+                  <Heading as='h5' size="sm">
+                    Target:
                   </Heading>
                   <RadioGroupHF name="target" value="svg">
                     <Radio value="svg">SVG</Radio>
@@ -179,14 +173,20 @@ const ExportFile = (props: IProps) => {
                 </Flex>
 
                 <Flex direction="column" gap={2}>
-                  <Heading as='h5' size="md">
+                  <Heading as='h5' size="sm">
                     Options:
                   </Heading>
                   <SwitchHF label="Export with dark mode:" name="withDarkTheme" value={false} />
                   <SwitchHF label="Export with embed scene:" name="withEmbebScene" value={false} />
                   <SwitchHF label="Mantain background:" name="withBackground" value={false} />  
                 </Flex>
-              </Flex>   
+              </Flex>
+              <Heading as='h4' size='md'>
+                Preview:
+              </Heading>
+              {
+                <ExportPreview drawApi={drawApi} />
+              }   
             </VStack>
 
           </DrawerBody>
@@ -211,7 +211,6 @@ interface IPreviewProps {
 const ExportPreview = (props: IPreviewProps) => {
   const { drawApi } = props
   const [exportPreview, setExportPreview] = React.useState<SVGSVGElement>()
-
   const { watch } = useFormContext<IExportForm>()
 
   const watchWithDarkTheme = watch('withDarkTheme')
@@ -227,7 +226,7 @@ const ExportPreview = (props: IPreviewProps) => {
         exportBackground: watchWithBackground,
         exportEmbedScene: watchWithEmbebScene,
         theme: watchWithDarkTheme ? 'dark' : 'light',
-        exportScale: 0.5,
+        exportScale: 0.3,
       },
       files: drawApi.getFiles()
     }).then((file) => {
@@ -236,12 +235,23 @@ const ExportPreview = (props: IPreviewProps) => {
   }, [watchWithEmbebScene, watchWithDarkTheme, watchWithBackground, drawApi])
 
   return (
-    <Flex direction="row" justifyContent="center" width="100%">
+    <Flex 
+      direction="row" 
+      justifyContent="center" 
+      width="100%"
+      height="100%"
+      overflowX="scroll" 
+    >
       {
         exportPreview && (
           <Box 
             background={watchWithDarkTheme ? 'black' : 'transparent'} 
             role="img"
+            overflowY="scroll"
+            borderStyle="solid"
+            borderWidth="1px"
+            border={useColorModeValue('gray.200', 'gray.700')}
+            borderRadius="15px"
             dangerouslySetInnerHTML={{ __html: exportPreview.outerHTML }} 
           />
         )

@@ -103,6 +103,11 @@ const DrawPage = () => {
 
     openModal({
       component: ExportFile,
+      config: {
+        closeOnClickOutside: true,
+        closeOnEscapeKeydown: true,
+        size: 'xl',
+      },
       props: {
         drawInfo: { id: draw.name, name: draw.name, description: draw.description },
         drawApi: excalidrawAPI
