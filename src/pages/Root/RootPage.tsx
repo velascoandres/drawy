@@ -49,7 +49,7 @@ const RootPage = () => {
 
   const [query, setQuery] = React.useState<IDrawInfoQuery>({ page: 1 })
   const { data: response } = useGetDrawsInfoQuery(query)
-  const { isMobile, height } = useWindowSize()
+  const { height } = useWindowSize()
 
   const navigateToDrawPage = (item: IDrawListItem) => {
     navigate(`/draw/${item.id}`)
