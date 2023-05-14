@@ -30,7 +30,7 @@ const useWindowSize = () => {
     const getViewportProps = ({ innerWidth, innerHeight }: WindowInnerSize): ViewportProps => {
 
       const isMobileRange = innerWidth <= MOBILE_MAX_WIDTH
-      const isTabletRange = innerWidth <= TABLET_MAX_WIDTH && innerWidth > MOBILE_MAX_WIDTH
+      const isTabletRange = innerWidth > MOBILE_MAX_WIDTH && innerWidth <= TABLET_MAX_WIDTH
       const hasDifferentAspectRadio = innerHeight > innerWidth
 
       if (isMobileRange && hasDifferentAspectRadio) {

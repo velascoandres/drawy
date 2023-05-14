@@ -43,12 +43,11 @@ interface IExportForm {
 
 
 const ExportFile = (props: IProps) => {
-  const { drawApi, drawInfo } = props   
-
   const { closeModal } = useModalStore()
   const toast = useToast()
-
   const form = useForm<IExportForm>()
+
+  const { drawApi, drawInfo } = props
 
   const getSvgFile = (config: IExportForm) => {
     return exportToSvg({
@@ -185,7 +184,7 @@ const ExportFile = (props: IProps) => {
                 Preview:
               </Heading>
               {
-                <ExportPreview drawApi={drawApi} />
+                drawApi && <ExportPreview drawApi={drawApi} />
               }   
             </VStack>
 
@@ -212,6 +211,7 @@ const ExportPreview = (props: IPreviewProps) => {
   const { drawApi } = props
   const [exportPreview, setExportPreview] = React.useState<SVGSVGElement>()
   const { watch } = useFormContext<IExportForm>()
+  const color = useColorModeValue('gray.200', 'gray.700')
 
   const watchWithDarkTheme = watch('withDarkTheme')
   const watchWithBackground = watch('withBackground')
@@ -250,7 +250,7 @@ const ExportPreview = (props: IPreviewProps) => {
             overflowY="scroll"
             borderStyle="solid"
             borderWidth="1px"
-            border={useColorModeValue('gray.200', 'gray.700')}
+            border={color}
             borderRadius="15px"
             dangerouslySetInnerHTML={{ __html: exportPreview.outerHTML }} 
           />
