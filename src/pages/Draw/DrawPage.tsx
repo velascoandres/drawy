@@ -195,12 +195,11 @@ const DrawPage = () => {
             name={draw?.name}
             UIOptions={{ canvasActions: { loadScene: false } }}
           >
-            <div style={{ display: 'none' }}>
-
-              <MainMenu>
-                <MainMenu.DefaultItems.ClearCanvas />
-              </MainMenu>
-            </div>
+            <MainMenu>
+              <MainMenu.Group title="About Excalidraw">
+                <MainMenu.DefaultItems.Socials />
+              </MainMenu.Group>
+            </MainMenu>
           </Excalidraw>
         </Box>
       </Box>
