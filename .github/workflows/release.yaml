@@ -2,8 +2,6 @@ name: release
 run-name: 🚀 Release the app 🚀
 on:
   push:
-    branches:
-      - main
     tags:
       - 'v*'
   workflow_dispatch:
@@ -62,8 +60,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: 'alpha' # This only works if your workflow triggers on new tags.
+          tagName: ${{ github.ref_name }} # This only works if your workflow triggers on new tags.
           releaseName: 'Drawy v__VERSION__' # tauri-action replaces \_\_VERSION\_\_ with the app version.
           releaseBody: 'See the assets to download and install this version.'
           releaseDraft: true
-          prerelease: true
+          prerelease: false
