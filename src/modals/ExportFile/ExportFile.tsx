@@ -185,7 +185,7 @@ const ExportFile = (props: IProps) => {
                 Preview:
               </Heading>
               {
-                <ExportPreview drawApi={drawApi} />
+                drawApi && <ExportPreview drawApi={drawApi} />
               }   
             </VStack>
 

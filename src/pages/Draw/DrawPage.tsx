@@ -25,8 +25,8 @@ import { useGetDrawByIdQuery } from '@/queries/drawQueries'
 import useModalStore from '@/store/modal/modalStore'
 
 const UPDATE_SCENE_DEBOUNCE = 1000
-const HEIGHT_DELTA = 21.5
-const HEIGHT_DELTA_MOBILE = 101.5
+const HEIGHT_DELTA = 21
+const HEIGHT_DELTA_MOBILE = 101
 
 const DrawPage = () => {
   const params = useParams()
