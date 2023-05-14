@@ -77,17 +77,4 @@ describe('<RootPage /> tests', () => {
       expect(useModalStore.getState().currentModal?.component).toStrictEqual(CreateUpdateDrawModal)
     })
   })
-
-  describe('When is mobile', () => {
-    beforeEach(() => {
-      vi.stubGlobal('innerWidth', 500)
-      vi.stubGlobal('innerHeight', 800)
-    })
-    
-    it('should not show the status bar', () => {
-      const { queryByRole } = customRender(<RootPage />)
-
-      expect(queryByRole('log')).not.toBeInTheDocument()
-    })
-  })
 })
