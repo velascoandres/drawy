@@ -49,7 +49,7 @@ const RootPage = () => {
 
   const [query, setQuery] = React.useState<IDrawInfoQuery>({ page: 1 })
   const { data: response } = useGetDrawsInfoQuery(query)
-  const { isMobile, height } = useWindowSize()
+  const { height } = useWindowSize()
 
   const navigateToDrawPage = (item: IDrawListItem) => {
     navigate(`/draw/${item.id}`)
@@ -171,7 +171,7 @@ const RootPage = () => {
   )
 
   return (
-    <Box minH="100vh" bg={useColorModeValue('gray.100', 'gray.900')}>
+    <Box minH="100vh">
       {renderSideContent({ display: { base: 'none', md: 'block' } })}
       <Drawer
         autoFocus={false}
@@ -204,12 +204,10 @@ const RootPage = () => {
         />
         <Image fontFamily="Virgil" width="100px" src="/logo.png" alt="drawy-logo" />
       </Flex>
-      <Box ml={{ base: 0, md: 60 }} p="4">
+      <Box ml={{ base: 0, md: 60 }} py="4">
         <Outlet />
       </Box>
-      <Box display={{ md: 'none', lg: 'block', sm: 'none' }}>
-        {!isMobile && <StatusBar />}
-      </Box>
+      <StatusBar />
     </Box>
   )
 }

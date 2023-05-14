@@ -46,7 +46,7 @@ describe('<ExportFile /> tests', () => {
     
       await waitFor(() => {
         expect(getByText('Export draw')).toBeInTheDocument()
-        expect(getByText('Select the target:')).toBeInTheDocument()
+        expect(getByText('Target:')).toBeInTheDocument()
         expect(getByText('SVG')).toBeInTheDocument()
         expect(getByText('PNG')).toBeInTheDocument()
         expect(getByText('JSON')).toBeInTheDocument()

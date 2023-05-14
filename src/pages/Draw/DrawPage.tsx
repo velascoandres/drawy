@@ -1,11 +1,9 @@
 import React from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
-import { FiDownload } from 'react-icons/fi'
+import { FiDownload, FiGrid, FiMoon, FiSun } from 'react-icons/fi'
 import { useParams } from 'react-router-dom'
 
 import { 
   Box,
-  Divider, 
   Flex, 
   Heading,
   IconButton,
@@ -18,7 +16,6 @@ import {
   ExcalidrawImperativeAPI,
 } from '@excalidraw/excalidraw/types/types'
 
-import SwitchHF from '@/components/SwitchHF/SwitchHF'
 import initialData from '@/constants/initial-data'
 import useDebounceCallback from '@/hooks/useDebounceCallback'
 import useWindowSize from '@/hooks/useWindowSize'
@@ -28,18 +25,14 @@ import { useGetDrawByIdQuery } from '@/queries/drawQueries'
 import useModalStore from '@/store/modal/modalStore'
 
 const UPDATE_SCENE_DEBOUNCE = 1000
-const HEIGHT_DELTA = 100
-
-interface IDrawUIStatus {
-  darkMode: boolean
-  grid: boolean
-}
+const HEIGHT_DELTA = 21.5
+const HEIGHT_DELTA_MOBILE = 101.5
 
 const DrawPage = () => {
   const params = useParams()
   const { data: draw } = useGetDrawByIdQuery(params.drawId as string)
   const { mutate: updateDraw } = useUpdateDrawMutation()
-  const { height } = useWindowSize()
+  const { height, isMobile, isTablet } = useWindowSize()
 
   const { openModal } = useModalStore()
 
@@ -47,12 +40,8 @@ const DrawPage = () => {
 
   const debounceUpdateScene = useDebounceCallback(UPDATE_SCENE_DEBOUNCE)
 
-  const form = useForm<IDrawUIStatus>({
-    defaultValues: {
-      grid: false,
-      darkMode: false,
-    }
-  })
+  const [darkMode, setDarkMode] = React.useState(false)
+  const [enableGrid, setEnableGrid] = React.useState(false)
 
   const [
     excalidrawAPI,
@@ -103,6 +92,11 @@ const DrawPage = () => {
 
     openModal({
       component: ExportFile,
+      config: {
+        closeOnClickOutside: true,
+        closeOnEscapeKeydown: true,
+        size: 'xl',
+      },
       props: {
         drawInfo: { id: draw.name, name: draw.name, description: draw.description },
         drawApi: excalidrawAPI
@@ -136,8 +130,14 @@ const DrawPage = () => {
   }, [draw?.scene, excalidrawAPI])
 
   const canvasWrapperHeight = React.useMemo(
-    () => height - HEIGHT_DELTA, 
-    [height]
+    () => {
+      if (isMobile || isTablet) {
+        return height - HEIGHT_DELTA_MOBILE
+      }
+
+      return height - HEIGHT_DELTA
+    }, 
+    [height, isMobile, isTablet]
   )
 
   React.useEffect(() => {
@@ -148,9 +148,9 @@ const DrawPage = () => {
     const hasDarkMode = draw.scene?.appState?.theme === 'dark'
     const hasGrid = Boolean(draw.scene?.appState?.gridSize)
 
-    form.setValue('darkMode', hasDarkMode)
-    form.setValue('grid', hasGrid)
-  }, [draw?.scene, form])
+    setDarkMode(hasDarkMode)
+    setEnableGrid(hasGrid)
+  }, [draw?.scene])
 
   React.useLayoutEffect(() => {
     hasLoadedDrawRef.current = false
@@ -158,20 +158,27 @@ const DrawPage = () => {
   }, [params.drawId, excalidrawAPI])
 
   return (
-    <Flex align="start" direction="column" gap={2}>
-      <Flex direction="row" justifyContent="start" alignItems="center" gap={1}>
-        <IconButton icon={<FiDownload />} onClick={openExportModal} aria-label="export" />
+    <Flex align="start" direction="column" gap={2} position="relative">
+      <Flex direction="row" justifyContent="start" alignItems="center" gap={2} pl={4}>
+        <IconButton background="white" icon={<FiDownload />} onClick={openExportModal} aria-label="export" />
         <Heading as="h3" size="lg" cursor="pointer" >
           {draw?.name}
         </Heading>
+        <Flex direction="row" justifyContent="start" gap={2} position="absolute" right="1" top="1">
+          <IconButton
+            background="white" 
+            icon={<FiGrid fill={`${enableGrid ? 'white' : 'black'}`} />} 
+            aria-label="grid" 
+            onClick={() => setEnableGrid(value => !value)} 
+          />
+          <IconButton
+            background="white"
+            icon={darkMode ? <FiSun /> : <FiMoon fill="black" />} 
+            aria-label="dark-mode" 
+            onClick={() => setDarkMode(value => !value)} 
+          />
+        </Flex>
       </Flex>
-      <Divider background="black" />
-      <FormProvider {...form}>
-        <Flex direction="column" justifyContent="start" gap={0}>
-          <SwitchHF label="Dark mode:" name="darkMode" justifyContent="start" />
-          <SwitchHF label="Enable grid:" name="grid" justifyContent="start" />
-        </Flex> 
-      </FormProvider>
       <Box position="relative" width="100%">
         <Box height={canvasWrapperHeight} width="100%" position="absolute" paddingBottom={16}>
           <Excalidraw
@@ -183,13 +190,15 @@ const DrawPage = () => {
               debounceUpdateScene(() => handleChange([...elements], appState, files))
             }}
             viewModeEnabled={false}
-            gridModeEnabled={form.watch('grid')}
-            theme={form.watch('darkMode') ? 'dark' : 'light'}
+            gridModeEnabled={enableGrid}
+            theme={darkMode ? 'dark' : 'light'}
             name={draw?.name}
             UIOptions={{ canvasActions: { loadScene: false } }}
           >
             <MainMenu>
-              <MainMenu.DefaultItems.ChangeCanvasBackground />
+              <MainMenu.Group title="About Excalidraw">
+                <MainMenu.DefaultItems.Socials />
+              </MainMenu.Group>
             </MainMenu>
           </Excalidraw>
         </Box>

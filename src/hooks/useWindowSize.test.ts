@@ -11,7 +11,7 @@ describe('When window resize', () => {
     vi.stubGlobal('innerHeight', 800)
   })  
 
-  it('should return update window values', () => {
+  it('should return update window values (mobile)', () => {
     const { result } = renderHook(() => useWindowSize())
       
     act(() => {
@@ -20,6 +20,22 @@ describe('When window resize', () => {
     expect(result.current.width).toEqual(500)
     expect(result.current.height).toEqual(800)
     expect(result.current.isMobile).toBeTruthy()
+    expect(result.current.isTablet).toBeFalsy()
+  })
+
+  it('should return update window values (tablet)', () => {
+    vi.stubGlobal('innerWidth', 767)
+    vi.stubGlobal('innerHeight', 900)
+
+    const { result } = renderHook(() => useWindowSize())
+      
+    act(() => {
+      window.dispatchEvent(new Event('resize'))
+    })
+    expect(result.current.width).toEqual(767)
+    expect(result.current.height).toEqual(900)
+    expect(result.current.isMobile).toBeFalsy()
+    expect(result.current.isTablet).toBeTruthy()
   })
 
   it('should return update window values on multiple resize events', () => {
@@ -28,9 +44,9 @@ describe('When window resize', () => {
     act(() => {
       window.dispatchEvent(new Event('resize'))
     })
-    expect(result.current.width).toEqual(500)
-    expect(result.current.height).toEqual(800)
+
     expect(result.current.isMobile).toBeTruthy()
+    expect(result.current.isTablet).toBeFalsy()
 
     vi.stubGlobal('innerWidth', 1024)
     vi.stubGlobal('innerHeight', 720)
@@ -41,5 +57,6 @@ describe('When window resize', () => {
     expect(result.current.width).toEqual(1024)
     expect(result.current.height).toEqual(720)
     expect(result.current.isMobile).toBeFalsy()
+    expect(result.current.isTablet).toBeFalsy()
   })
 })

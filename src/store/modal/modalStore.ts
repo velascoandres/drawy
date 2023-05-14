@@ -6,6 +6,7 @@ import { devtools } from 'zustand/middleware'
 type IModalProps = { [key in string]: unknown }
 
 interface IModalConfig {
+    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'full'
     closeOnClickOutside: boolean
     closeOnEscapeKeydown: boolean
 }

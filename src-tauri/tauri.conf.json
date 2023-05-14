@@ -7,10 +7,17 @@
   },
   "package": {
     "productName": "Drawy",
-    "version": "0.1.0"
+    "version": "0.2.1"
   },
   "tauri": {
     "allowlist": {
+      "shell": {
+        "all": false,
+        "execute": false,
+        "open": true,
+        "scope": [],
+        "sidecar": false
+      },
       "all": false,
       "dialog": {
         "all": true,
