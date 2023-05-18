@@ -16,8 +16,13 @@ const drawInfo = { id: '1', name: 'draw 1' }
 vi.mock('@/mutations/drawMutations')
 
 const deleteMock = vi.fn()
+const navigateMock = vi.fn()
 
 const useDeleteDrawMutationMock = useDeleteDrawMutation as Mock
+
+vi.mock('react-router-dom', () => ({
+  useNavigate: () => navigateMock,
+}))
 
 describe('<DrawOptions /> tests', () => { 
   beforeEach(() => {
@@ -55,7 +60,7 @@ describe('<DrawOptions /> tests', () => {
     
       await userEvent.click(getByText('Confirm'))
           
-      expect(deleteMock).toHaveBeenCalledWith('1')
+      expect(deleteMock).toHaveBeenCalledWith('1', { onSuccess: expect.any(Function) })
     })
   })
     

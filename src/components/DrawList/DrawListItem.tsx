@@ -18,7 +18,8 @@ const DrawListItem = ({ item, children, ...rest }: IDrawListItemProps) => {
       onClick={() => onSelectItem(item)}
       bg={isSelected ? 'black' : 'white'}
       align="center"
-      p="4"
+      px="4"
+      py="6"
       mx="4"
       my="1"
       borderRadius="lg"

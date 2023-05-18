@@ -150,8 +150,11 @@ const RootPage = () => {
               >
                 {draw.name}
               </Heading>
-
-              <DrawOptions isOpen={isSelected} draw={draw} />
+              {
+                isSelected && (
+                  <DrawOptions isOpen={isSelected} draw={draw} />
+                )
+              }
             </Flex>
           )}
         </DrawList>

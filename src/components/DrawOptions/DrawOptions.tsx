@@ -1,6 +1,8 @@
+import React from 'react'
 import { FiInfo, FiMoreVertical, FiTrash } from 'react-icons/fi'
+import { useNavigate } from 'react-router-dom'
 
-import { IconButton, Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
+import { IconButton, Menu, MenuButton, MenuItem, MenuList, useToast } from '@chakra-ui/react'
 
 import CreateUpdateDrawModal from '@/modals/CreateUpdateDraw/CreateUpdateDrawModal'
 import { useDeleteDrawMutation } from '@/mutations/drawMutations'
@@ -20,9 +22,10 @@ const DrawOptions = (props: IProps) => {
   const { isOpen, draw } = props
   const { openModal } = useModalStore()
   const { openConfirmation } = useConfirmationStore()
+  const navigate = useNavigate()
 
   const { mutate: deleteDraw } = useDeleteDrawMutation()
-
+  const toast = useToast()
 
   const openCrateUpdateDrawModal = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -39,13 +42,27 @@ const DrawOptions = (props: IProps) => {
     })
   }
 
+
+  const handleDeleteSuccess = () => {
+    navigate('/')
+    toast({
+      title: 'Draw removed',
+      position: 'bottom-right',
+      status: 'success',
+      isClosable: true,
+    })
+  }
+
   const handleDeleteDraw = (e: React.MouseEvent) => {
     e.stopPropagation()
 
     openConfirmation({
       title: 'Confirm action',
       content: `Do you want to delete: ${draw.name}?`,
-      onConfirm: () => deleteDraw(draw.id.toString())
+      onConfirm: () => deleteDraw(
+        draw.id.toString(), 
+        { onSuccess: handleDeleteSuccess }
+      )
     })
   }
 
@@ -55,6 +72,7 @@ const DrawOptions = (props: IProps) => {
         as={IconButton}
         aria-label="options"
         bg="transparent"
+        height={6}
         _hover={{ bg: 'tranparent', borderWidth: '1px', borderColor: isOpen ? 'white' : 'black' }}
         _expanded={{ bg: 'transparent', borderWidth: '1px', borderColor: isOpen ? 'white' : 'black' }}
         icon={<FiMoreVertical />}
