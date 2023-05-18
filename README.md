@@ -5,8 +5,7 @@
 
 A small desktop application made with Tauri to save excalidraw whiteboards locally
 
-![Cover2](https://github.com/velascoandres/drawy/assets/12194462/7099aeb3-5f8e-41ec-94f0-21f9c6c651f2)
-
+![Cover](https://github.com/velascoandres/drawy/assets/12194462/94d9a8dc-5809-4006-8719-9bc44bf964ad)
 
 
 
