@@ -26,9 +26,9 @@ A small desktop application made with Tauri to save excalidraw whiteboards local
 - [x] Manage whiteboards (CRUD)
 - [x] Search by name or description
 - [x] Export to: png, svg and json
-- [x] Toggle to dark mode or gride view throught custom buttons
-- [ ] Import from a json file throught a custom UI.
-- [ ] Load libraries throught a custom UI  
+- [x] Toggle to dark mode or grid view through custom buttons
+- [ ] Import from a json file through a custom UI.
+- [ ] Load libraries through a custom UI  
 
 ## Setup
 
