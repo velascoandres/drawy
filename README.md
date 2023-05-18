@@ -5,6 +5,10 @@
 
 A small desktop application made with Tauri to save excalidraw whiteboards locally
 
+![Cover2](https://github.com/velascoandres/drawy/assets/12194462/7099aeb3-5f8e-41ec-94f0-21f9c6c651f2)
+
+
+
 
 ## Used technologies
 - Tauri.js
@@ -17,6 +21,15 @@ A small desktop application made with Tauri to save excalidraw whiteboards local
 - Eslint
 - React Hook Form
 - Yup form validator
+
+
+## Roadmap
+- [x] Manage whiteboards (CRUD)
+- [x] Search by name or description
+- [x] Export to: png, svg and json
+- [x] Toggle to dark mode or gride view throught custom buttons
+- [ ] Import from a json file throught a custom UI.
+- [ ] Load libraries throught a custom UI  
 
 ## Setup
 
@@ -40,8 +53,4 @@ Run Tauri app
 ```
 pnpm tauri dev
 ```
-
-### Screenshots
-
-![image](https://user-images.githubusercontent.com/12194462/235833645-50de3129-423f-4768-b930-e74c600cb502.png)
 
