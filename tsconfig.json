@@ -23,6 +23,7 @@
       "@/queries/*": ["src/queries/*"],
       "@/mutations/*": ["src/mutations/*"],
       "@/pages/*": ["src/pages/*"],
+      "@/utils/*": ["src/utils/*"],
       "@/dtos/*": ["src/dtos/*"],
       "@/hooks/*": ["src/hooks/*"],
       "@/store/*": ["src/store/*"],

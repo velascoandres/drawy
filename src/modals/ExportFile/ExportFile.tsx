@@ -80,6 +80,8 @@ const ExportFile = (props: IProps) => {
 
   const getJSONBlobFile = (config: IExportForm) => {
     const str = JSON.stringify({
+      drawName: drawInfo.name,
+      drawDescription: drawInfo.description,
       elements: drawApi.getSceneElements(),
       mimeType: 'image/png',
       appState: {
@@ -181,8 +183,9 @@ const ExportFile = (props: IProps) => {
               <Heading as='h4' size='md'>
                 Preview:
               </Heading>
-              {
-                drawApi && 
+              <Flex direction="column" justifyContent="center" alignItems="center">
+                {
+                  drawApi && 
                 <DrawPreview 
                   darkMode={form.watch('withDarkTheme')}
                   includeBackground={form.watch('withBackground')}
@@ -193,7 +196,8 @@ const ExportFile = (props: IProps) => {
                     files: drawApi.getFiles()
                   }} 
                 />
-              }   
+                }
+              </Flex>   
             </VStack>
 
           </DrawerBody>

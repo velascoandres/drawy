@@ -12,6 +12,8 @@ import ConfirmationContainer from '@/components/ConfirmationContainer/Confirmati
 import ModalContainer from '@/components/ModalContainer/ModalContainer'
 import ROUTES from '@/constants/routes'
 
+import { EventsContainer } from './components/EventsContainer/EventsContainer'
+
 import '@/styles/main.css'
 
 const router = createBrowserRouter(ROUTES)
@@ -33,6 +35,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
       <ChakraProvider>
         <RouterProvider router={router} />
         <ModalContainer />
+        <EventsContainer />
         <ConfirmationContainer />
       </ChakraProvider>
     </QueryClientProvider>

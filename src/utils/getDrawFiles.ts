@@ -4,7 +4,8 @@ import { homeDir } from '@tauri-apps/api/path'
 
 
 export interface IEntryFile {
-  [k: string]: unknown
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [k: string]: any
 }
 
 interface IOptions {
@@ -49,7 +50,7 @@ const getDrawFiles = async (args?: IOptions): Promise<IEntryFile[] | IEntryFile 
   })
 
   if (!paths) {
-    return []
+    return
   }
 
   const files = []

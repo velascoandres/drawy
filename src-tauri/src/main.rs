@@ -1,5 +1,5 @@
 use std::sync::Mutex;
-use drawy::{db, state::AppState, cmds::*};
+use drawy::{db, state::AppState, cmds::*, menu};
 
 #[cfg_attr(
     all(not(debug_assertions), target_os = "windows"),
@@ -11,8 +11,9 @@ fn main() {
         conn: Mutex::new(db::establish_connection())
     };
 
-
     tauri::Builder::default()
+        .menu(menu::get_menu())
+        .on_menu_event(menu::get_handlers)
         .manage(state)
         .invoke_handler(tauri::generate_handler![
             create_draw_command, 

@@ -48,14 +48,11 @@ const DrawPreview = (props: IProps) => {
     <Box 
       background={darkMode ? 'black' : 'transparent'} 
       role="img"
-      borderStyle="solid"
-      borderWidth="1px"
       border={color}
-      borderRadius="15px"
-      overflowY="scroll"
-      overflowX="scroll"
+      overflowY="auto"
+      overflowX="auto"
       height="500px"
-      width="800px"
+      width="600px"
       dangerouslySetInnerHTML={{ __html: exportPreview.outerHTML }} 
     />
   )
