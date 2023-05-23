@@ -1,7 +1,8 @@
 import React from 'react'
 import {
   FiMenu,
-  FiPlus,
+  FiPlus, 
+  FiUpload 
 } from 'react-icons/fi'
 import { Outlet, useNavigate, useParams } from 'react-router-dom'
 
@@ -27,6 +28,7 @@ import SearchInput from '@/components/SearchInput/SearchInput'
 import StatusBar from '@/components/StatusBar/StatusBar'
 import useWindowSize from '@/hooks/useWindowSize'
 import CreateUpdateDrawModal from '@/modals/CreateUpdateDraw/CreateUpdateDrawModal'
+import ImportFile from '@/modals/ImportFile/ImportFile'
 import { useGetDrawsInfoQuery } from '@/queries/drawQueries'
 import { IDrawInfoQuery } from '@/services/drawService'
 import useModalStore from '@/store/modal/modalStore'
@@ -96,6 +98,17 @@ const RootPage = () => {
       
   }, [height])
 
+  const openImportDraw = () => {
+    openModal({
+      component: ImportFile,
+      config: {
+        closeOnClickOutside: false,
+        closeOnEscapeKeydown: true,
+        size: 'lg'
+      }
+    })
+  }
+
 
   const renderSideContent = (props: BoxProps = {}) => (
     <Box
@@ -126,6 +139,15 @@ const RootPage = () => {
         >
           Add draw
         </Button>
+        <Button 
+          leftIcon={<FiUpload />} 
+          variant="ghost"
+          mx={4} 
+          width="100%"
+          onClick={openImportDraw}
+        >
+          Import
+        </Button>
       </Flex>
       <Box overflowY="auto" height={listHeight}>
         <DrawList 
@@ -134,13 +156,14 @@ const RootPage = () => {
           onSelectDraw={navigateToDrawPage}
         > 
 
-          {(draw, isSelected) => (
+          {({ draw, isSelected, isHovered }) => (
             <Flex 
               direction="row" 
               gap={2} 
               alignContent="space-between" 
               width="100%"
               alignItems="center"
+              height={5}
             >
               <Heading 
                 as='h6' 
@@ -151,7 +174,7 @@ const RootPage = () => {
                 {draw.name}
               </Heading>
               {
-                isSelected && (
+                (isSelected || isHovered) && (
                   <DrawOptions isOpen={isSelected} draw={draw} />
                 )
               }

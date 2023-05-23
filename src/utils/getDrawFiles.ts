@@ -1,6 +1,5 @@
 import { open } from '@tauri-apps/api/dialog'
 import { readTextFile } from '@tauri-apps/api/fs'
-import { homeDir } from '@tauri-apps/api/path'
 
 
 export interface IEntryFile {
@@ -41,11 +40,8 @@ const parseFile = (file: string): IEntryFile | null => {
 const getDrawFiles = async (args?: IOptions): Promise<IEntryFile[] | IEntryFile | undefined> => {
   const { multiple = false } = args || {}
 
-  const basePath = await homeDir()
-
   const paths = await open({
     multiple,
-    defaultPath: basePath,
     filters: [{ name: 'json', extensions: ['json'] }],
   })
 

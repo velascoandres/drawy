@@ -1,7 +1,7 @@
 use tauri::{CustomMenuItem, Menu, WindowMenuEvent, Submenu, MenuItem};
 
 pub fn get_menu() -> Menu {
-    let import = CustomMenuItem::new("import".to_string(), "Import");
+    let import = CustomMenuItem::new("import".to_string(), "Import from your computer");
     let close = CustomMenuItem::new("close".to_string(), "Close");
 
     let submenu = Submenu::new("File", Menu::new().add_item(import).add_item(close));

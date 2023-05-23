@@ -10,12 +10,14 @@ export interface IDrawListItemProps extends FlexProps {
     children: React.ReactNode
 }
 const DrawListItem = ({ item, children, ...rest }: IDrawListItemProps) => {
-  const { onSelectItem, selectedItem } = React.useContext(DrawListContext) as IDrawListContext
+  const { onSelectItem, selectedItem, onHoverItem, unHover } = React.useContext(DrawListContext) as IDrawListContext
   const isSelected = selectedItem?.id === item.id
 
   return (
     <Flex
       onClick={() => onSelectItem(item)}
+      onMouseEnter={() => onHoverItem(item) }
+      onMouseLeave={() => unHover() }
       bg={isSelected ? 'black' : 'white'}
       align="center"
       px="4"

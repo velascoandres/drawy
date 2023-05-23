@@ -78,16 +78,11 @@ const ExportFile = (props: IProps) => {
     })
   }
 
-  const getJSONBlobFile = (config: IExportForm) => {
+  const getJSONBlobFile = () => {
     const str = JSON.stringify({
       drawName: drawInfo.name,
       drawDescription: drawInfo.description,
       elements: drawApi.getSceneElements(),
-      mimeType: 'image/png',
-      appState: {
-        ...(drawApi.getAppState() || {}),
-        theme: config.withDarkTheme ? 'dark' : 'light',
-      },
       files: drawApi.getFiles()
     })
     const bytes = new TextEncoder().encode(str)

@@ -12,7 +12,7 @@ describe('<DrawList /> tests', () => {
     it.each(items)('should show a $name', ({ name }) => {
       const { getByText } = customRender(
         <DrawList items={items} onSelectDraw={vi.fn()}>
-          {({ name }) => <div>{name}</div>}
+          {({ draw }) => <div>{draw.name}</div>}
         </DrawList>
       )
 
@@ -26,7 +26,7 @@ describe('<DrawList /> tests', () => {
 
       const { getByText } = customRender(
         <DrawList items={items} onSelectDraw={onSelectMock}>
-          {({ name }) => <div>{name}</div>}
+          {({ draw }) => <div>{draw.name}</div>}
         </DrawList>
       )
 

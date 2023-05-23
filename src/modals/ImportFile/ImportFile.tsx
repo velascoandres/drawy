@@ -1,5 +1,7 @@
 import React from 'react'
-import { FiUpload } from 'react-icons/fi'
+import { FormProvider, useForm } from 'react-hook-form'
+import { FiFolder } from 'react-icons/fi'
+import * as yup from 'yup'
 
 import {
   Button,
@@ -9,92 +11,150 @@ import {
   DrawerFooter,
   DrawerHeader,
   Flex,
-  Heading,
   Tab,
   TabList,
   TabPanel,
   TabPanels,
   Tabs,
-  Text
 } from '@chakra-ui/react'
+import { BinaryFileData, BinaryFiles } from '@excalidraw/excalidraw/types/types'
+import { yupResolver } from '@hookform/resolvers/yup'
 
 import DrawPreview from '@/components/DrawPreview/DrawPreview'
+import InputHF from '@/components/InputHF/InputHF'
+import TextareaHF from '@/components/TextareaHF/TextareaHF'
+import { useCreateDrawMutation } from '@/mutations/drawMutations'
+import { IDraw } from '@/services/drawService'
 import useModalStore from '@/store/modal/modalStore'
 import getDrawFiles, { IEntryFile } from '@/utils/getDrawFiles'
 
 
-const ImportFile = () => {
-  const [selectedFile, setSelectedFile] = React.useState<IEntryFile>()
+type IDrawForm = Omit<IDraw, 'id'> & {
+  scene: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    elements: readonly any[],
+    files?: BinaryFileData[]
+  }
+}
 
+const drawSchema = yup.object().shape({
+  name: yup.string().required('This field is required'),
+  description: yup.string().nullable(),
+  scene: yup.object().nullable(),
+})
+
+const ImportFile = () => {
   const { closeModal } = useModalStore()
+  const { mutate: createDraw } = useCreateDrawMutation()
+  const [loadedFile, setLoadedFile] = React.useState(false)
+  const [binaryFiles, setBinaryFiles] = React.useState<BinaryFiles>()
+
+  const form = useForm<IDrawForm>({
+    defaultValues: {
+      name: '',
+      description: '',
+      scene: {
+        elements: [],
+        files: []
+      }
+    },
+    resolver: yupResolver(drawSchema)
+  })
+
+  const onSubmit = (formValues: IDrawForm) => {
+    createDraw(formValues, { onSuccess: closeModal })
+  }
+
 
   const openFileExplorer = React.useCallback(() => {
     getDrawFiles({ multiple: false })
     .then((files) => {
-      console.log(files)
-      setSelectedFile(files as IEntryFile)
+      const drawFile = files as IEntryFile 
+
+      setLoadedFile(true)
+      setBinaryFiles(drawFile.files || {})
+    
+      form.setValue('name', drawFile.drawName)
+      form.setValue('description', drawFile.drawDescription)
+      form.setValue('scene', {
+        appState: {},
+        elements: drawFile.elements || [],
+        files: Object.values(drawFile.files || {}) as BinaryFileData[]
+      })
     })
-  }, [])
+  }, [form])
 
   return (
-    <DrawerContent>
-      <DrawerHeader borderBottomWidth="1px">Import from file</DrawerHeader>
-      <DrawerCloseButton />
-      <DrawerBody>
-        {
-          selectedFile ? (<Tabs>
-            <TabList>
-              <Tab>Draw information</Tab>
-              <Tab>Preview</Tab>
-            </TabList>
+    <form onSubmit={form.handleSubmit(onSubmit)}>
+      <DrawerContent>
+        <DrawerHeader borderBottomWidth="1px">Import from file</DrawerHeader>
+        <DrawerCloseButton />
+        <DrawerBody>
+          {
+            loadedFile ? (<Tabs>
+              <TabList>
+                <Tab>Draw information</Tab>
+                <Tab>Preview</Tab>
+              </TabList>
 
-            <TabPanels>
-              <TabPanel>
-                <Heading as='h5' size="sm">
-                  {selectedFile.drawName}
-                </Heading>
-                <Text fontSize='lg'>
-                  {selectedFile.drawDescription}
-                </Text>
-              </TabPanel>
-              <TabPanel>
-                <DrawPreview
-                  drawScene={{
-                    appState: selectedFile.appState || {},
-                    elements: selectedFile.elements || [],
-                    files: selectedFile.files || null
-                  }}
-                />
-              </TabPanel>
-            </TabPanels>
-          </Tabs>
-          ) : (
-            <Flex direction="column" justify="center" alignItems="center" height="100%">
-              <Button 
-                leftIcon={<FiUpload />} 
-                variant="outline"
-                mx={4} 
-                onClick={openFileExplorer}
-              >
-                Open explorer
-              </Button>
-            </Flex>
-          )
-        }
-      </DrawerBody>
-      <DrawerFooter gap={2}>
-        <Button
-          variant="solid"
-          background="black"
-          color="white"
-          type="button"
-          disabled={!Boolean(selectedFile)}
-        >
-          Import
-        </Button>
-        <Button variant="ghost" onClick={closeModal}>Cancel</Button>
-      </DrawerFooter>
-    </DrawerContent>
+              <TabPanels>
+                <TabPanel>
+                  <FormProvider {...form}>
+                    <Flex direction="column" gap={2}>
+                      <InputHF
+                        name="name"
+                        label="Name"
+                        inputProps={{ placeholder: 'Write a name for your draw' }}
+                        helperText="Type a draw name"
+                      />
+                      <TextareaHF
+                        name="description"
+                        label="Description"
+                        textareaProps={{ placeholder: 'Write a full description for your draw' }}
+                        helperText="Provide a complete description for the draw"
+                      />
+                    </Flex>
+
+                  </FormProvider>
+                </TabPanel>
+                <TabPanel>
+                  <DrawPreview
+                    drawScene={{
+                      ...form.watch('scene') || {},
+                      appState: {},
+                      files: binaryFiles,
+                    }}
+                  />
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+            ) : (
+              <Flex direction="column" justify="center" alignItems="center" height="100%">
+                <Button
+                  leftIcon={<FiFolder />}
+                  variant="outline"
+                  mx={4}
+                  onClick={openFileExplorer}
+                >
+                  Open explorer
+                </Button>
+              </Flex>
+            )
+          }
+        </DrawerBody>
+        <DrawerFooter gap={2}>
+          <Button
+            variant="solid"
+            colorScheme="blue"
+            type="submit"
+            disabled={!form.formState.isValid}
+          >
+            Import
+          </Button>
+          <Button variant="ghost" onClick={closeModal}>Cancel</Button>
+        </DrawerFooter>
+      </DrawerContent>
+    </form>
   )
 }
 
