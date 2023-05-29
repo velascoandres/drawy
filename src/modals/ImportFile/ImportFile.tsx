@@ -16,6 +16,7 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
+  useToast,
 } from '@chakra-ui/react'
 import { BinaryFileData, BinaryFiles } from '@excalidraw/excalidraw/types/types'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -26,7 +27,7 @@ import TextareaHF from '@/components/TextareaHF/TextareaHF'
 import { useCreateDrawMutation } from '@/mutations/drawMutations'
 import { IDraw } from '@/services/drawService'
 import useModalStore from '@/store/modal/modalStore'
-import getDrawFiles, { IEntryFile } from '@/utils/getDrawFiles'
+import getDrawFiles, { type IEntryFile } from '@/utils/getDrawFiles'
 
 
 type IDrawForm = Omit<IDraw, 'id'> & {
@@ -48,6 +49,7 @@ const ImportFile = () => {
   const { mutate: createDraw } = useCreateDrawMutation()
   const [loadedFile, setLoadedFile] = React.useState(false)
   const [binaryFiles, setBinaryFiles] = React.useState<BinaryFiles>()
+  const toast = useToast()
 
   const form = useForm<IDrawForm>({
     defaultValues: {
@@ -61,8 +63,28 @@ const ImportFile = () => {
     resolver: yupResolver(drawSchema)
   })
 
+  const handleSuccess = () => {
+    toast({
+      status: 'success',
+      title: 'Draw was imported',
+      position: 'bottom-right',
+    })
+    closeModal()
+  }
+
+  const handleError = () => {
+    toast({
+      status: 'error',
+      title: 'Error on importing draw',
+      position: 'bottom-right',
+    })
+  }
+
   const onSubmit = (formValues: IDrawForm) => {
-    createDraw(formValues, { onSuccess: closeModal })
+    createDraw(formValues, { 
+      onSuccess: handleSuccess, 
+      onError: handleError 
+    })
   }
 
 
@@ -73,7 +95,7 @@ const ImportFile = () => {
 
       setLoadedFile(true)
       setBinaryFiles(drawFile.files || {})
-    
+
       form.setValue('name', drawFile.drawName)
       form.setValue('description', drawFile.drawDescription)
       form.setValue('scene', {
@@ -81,8 +103,14 @@ const ImportFile = () => {
         elements: drawFile.elements || [],
         files: Object.values(drawFile.files || {}) as BinaryFileData[]
       })
+    }).catch(() => {
+      toast({
+        status: 'error',
+        title: 'Error on loading file',
+        position: 'bottom-right',
+      })
     })
-  }, [form])
+  }, [form, toast])
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
