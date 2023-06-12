@@ -22,6 +22,7 @@ chrono = "0.4.24"
 diesel = {version = "2.0.3", features = ["sqlite", "chrono"] }
 libmath = "0.2.1"
 diesel_migrations = "2.0.0"
+async-trait = "0.1.68"
 
 [dependencies.rusqlite]
 version = "0.29.0"
