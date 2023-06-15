@@ -39,7 +39,7 @@ where
         search: Option<String>,
         page: i64,
     ) -> Result<DrawPaginatedModel, CustomError> {
-        let mut offset = 10;
+        let mut offset = INITAL_OFFSET;
 
         if page > 1 {
             offset = (page - 1) * INFO_DRAW_PAGINATION;

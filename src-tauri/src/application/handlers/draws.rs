@@ -1,3 +1,4 @@
+use crate::application::dtos::response::PaginatedResponse;
 use crate::application::{dtos::response::Response, models::app_state::AppState};
 use crate::domain::models::draw::{DrawCreateModel, DrawUpdateModel};
 
@@ -65,7 +66,7 @@ pub fn delete_draw_command(draw_id: String, state: tauri::State<AppState>) -> St
 pub fn find_info_draws_command(search: Option<String>, page: i64, state: tauri::State<AppState>) -> String {
     let result = state.draw_service.find_draws_info(search, page);
 
-    let response = Response::new(result);
+    let response = PaginatedResponse::new(result);
 
     serde_json::to_string(&response).unwrap()
 }

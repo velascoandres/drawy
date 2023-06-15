@@ -58,6 +58,8 @@ export const useGetDrawsInfoQuery = (query: IDrawInfoQuery) => {
         throw new Error('Error on fetching draws info')
       }
 
+      console.log(response)
+
       return {
         results: response.data || [],
         count: response.count,

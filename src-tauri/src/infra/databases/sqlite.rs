@@ -1,33 +1,31 @@
 extern crate diesel;
 
-use diesel::prelude::*;
 use diesel_migrations::MigrationHarness;
 use diesel_migrations::{embed_migrations, EmbeddedMigrations};
 
-pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("./migrations");
+pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("./src/infra/databases/migrations");
 
 use diesel::r2d2::ConnectionManager;
 use diesel::sqlite::SqliteConnection;
 
 
 pub type DBConn = diesel::r2d2::Pool<ConnectionManager<SqliteConnection>>;
+pub type PooledConection = diesel::r2d2::PooledConnection<ConnectionManager<SqliteConnection>>;
 
-pub fn get_sqlite_conn() -> diesel::r2d2::Pool<ConnectionManager<SqliteConnection>> {
+pub fn get_sqlite_pool() -> diesel::r2d2::Pool<ConnectionManager<SqliteConnection>> {
     let database_url = "draws.db";
-    let mut conn = SqliteConnection::establish(database_url)
-        .unwrap_or_else(|_| panic!("Error connecting to {}", database_url));
 
-    let manager = ConnectionManager::<SqliteConnection>::new("db.sqlite");
+    let manager = ConnectionManager::<SqliteConnection>::new(database_url);
     let pool = diesel::r2d2::Pool::builder()
         .build(manager)
         .expect("Failed to create pool.");
 
-    run_migration(&mut conn);
+    run_migration(&mut pool.get().unwrap());
 
     pool
 }
 
-fn run_migration(conn: &mut SqliteConnection) {
+fn run_migration(conn: &mut PooledConection) {
     conn.run_pending_migrations(MIGRATIONS).unwrap();
 }
 

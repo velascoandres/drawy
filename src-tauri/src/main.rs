@@ -1,6 +1,6 @@
 use drawy::application::{handlers::draws, models::app_state::AppState};
 use drawy::domain::services::draw::DrawService;
-use drawy::infra::databases::sqlite::get_sqlite_conn;
+use drawy::infra::databases::sqlite::get_sqlite_pool;
 use drawy::infra::repositories::draws::DrawRepositoryImpl;
 use drawy::menu;
 
@@ -10,7 +10,7 @@ use drawy::menu;
 )]
 
 fn main() {
-    let draw_service = DrawService::new(DrawRepositoryImpl::new(get_sqlite_conn()));
+    let draw_service = DrawService::new(DrawRepositoryImpl::new(get_sqlite_pool()));
 
     let state = AppState {
         draw_service

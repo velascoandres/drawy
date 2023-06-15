@@ -144,7 +144,6 @@ impl DrawRepository for DrawRepositoryImpl {
 
     fn find_draws_info(&self, query: &FindDrawQuery) -> Result<DrawPaginatedModel, CustomError>{
         use crate::infra::databases::schema::draws::dsl::*;
-
         let page_size: i64 = 10;
     
         let mut base_query = draws

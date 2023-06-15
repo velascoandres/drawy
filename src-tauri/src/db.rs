@@ -4,7 +4,7 @@ use diesel::prelude::*;
 use diesel_migrations::{embed_migrations, EmbeddedMigrations};
 use diesel_migrations::MigrationHarness;
 
-pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("./migrations");
+pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("./src/infra/databases/migrations");
 
 
 pub fn establish_connection() -> SqliteConnection {
