@@ -30,10 +30,10 @@
       "fs": {
         "all": false,
         "copyFile": false,
-        "createDir": false,
+        "createDir": true,
         "exists": true,
         "readDir": false,
-        "readFile": false,
+        "readFile": true,
         "removeDir": false,
         "removeFile": true,
         "renameFile": true,

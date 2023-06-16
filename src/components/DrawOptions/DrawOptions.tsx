@@ -72,7 +72,7 @@ const DrawOptions = (props: IProps) => {
         as={IconButton}
         aria-label="options"
         bg="transparent"
-        height={6}
+        height={10}
         _hover={{ bg: 'tranparent', borderWidth: '1px', borderColor: isOpen ? 'white' : 'black' }}
         _expanded={{ bg: 'transparent', borderWidth: '1px', borderColor: isOpen ? 'white' : 'black' }}
         icon={<FiMoreVertical />}

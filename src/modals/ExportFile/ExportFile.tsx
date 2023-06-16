@@ -1,9 +1,7 @@
-import React from 'react'
-import { FormProvider, useForm, useFormContext } from 'react-hook-form'
+import { FormProvider, useForm } from 'react-hook-form'
 
 import { 
-  Box,
-  Button, 
+  Button,
   DrawerBody, 
   DrawerCloseButton, 
   DrawerContent, 
@@ -12,7 +10,6 @@ import {
   Flex, 
   Heading,
   Radio, 
-  useColorModeValue, 
   useToast, 
   VStack 
 } from '@chakra-ui/react'
@@ -22,6 +19,7 @@ import { save } from '@tauri-apps/api/dialog'
 import { writeBinaryFile } from '@tauri-apps/api/fs'
 import { downloadDir } from '@tauri-apps/api/path'
 
+import DrawPreview from '@/components/DrawPreview/DrawPreview'
 import RadioGroupHF from '@/components/RadioGroupHF/RadioGroupHF'
 import SwitchHF from '@/components/SwitchHF/SwitchHF'
 import { IDrawInfo } from '@/services/drawService'
@@ -80,14 +78,11 @@ const ExportFile = (props: IProps) => {
     })
   }
 
-  const getJSONBlobFile = (config: IExportForm) => {
+  const getJSONBlobFile = () => {
     const str = JSON.stringify({
+      drawName: drawInfo.name,
+      drawDescription: drawInfo.description,
       elements: drawApi.getSceneElements(),
-      mimeType: 'image/png',
-      appState: {
-        ...(drawApi.getAppState() || {}),
-        theme: config.withDarkTheme ? 'dark' : 'light',
-      },
       files: drawApi.getFiles()
     })
     const bytes = new TextEncoder().encode(str)
@@ -183,9 +178,21 @@ const ExportFile = (props: IProps) => {
               <Heading as='h4' size='md'>
                 Preview:
               </Heading>
-              {
-                drawApi && <ExportPreview drawApi={drawApi} />
-              }   
+              <Flex direction="column" justifyContent="center" alignItems="center">
+                {
+                  drawApi && 
+                <DrawPreview 
+                  darkMode={form.watch('withDarkTheme')}
+                  includeBackground={form.watch('withBackground')}
+                  embebScene={form.watch('withEmbebScene')}
+                  drawScene={{
+                    elements: drawApi.getSceneElements(),
+                    appState: drawApi.getAppState(),
+                    files: drawApi.getFiles()
+                  }} 
+                />
+                }
+              </Flex>   
             </VStack>
 
           </DrawerBody>
@@ -200,63 +207,6 @@ const ExportFile = (props: IProps) => {
         </FormProvider>
       </DrawerContent>
     </form>
-  )
-}
-
-interface IPreviewProps {
-  drawApi: ExcalidrawImperativeAPI 
-}
-
-const ExportPreview = (props: IPreviewProps) => {
-  const { drawApi } = props
-  const [exportPreview, setExportPreview] = React.useState<SVGSVGElement>()
-  const { watch } = useFormContext<IExportForm>()
-  const color = useColorModeValue('gray.200', 'gray.700')
-
-  const watchWithDarkTheme = watch('withDarkTheme')
-  const watchWithBackground = watch('withBackground')
-  const watchWithEmbebScene = watch('withEmbebScene')
-
-  React.useEffect(() => {
-    exportToSvg({
-      elements: drawApi.getSceneElements(),
-      appState: {
-        ...drawApi.getAppState(),
-        exportWithDarkMode: watchWithDarkTheme,
-        exportBackground: watchWithBackground,
-        exportEmbedScene: watchWithEmbebScene,
-        theme: watchWithDarkTheme ? 'dark' : 'light',
-        exportScale: 0.3,
-      },
-      files: drawApi.getFiles()
-    }).then((file) => {
-      setExportPreview(file)
-    })
-  }, [watchWithEmbebScene, watchWithDarkTheme, watchWithBackground, drawApi])
-
-  return (
-    <Flex 
-      direction="row" 
-      justifyContent="center" 
-      width="100%"
-      height="100%"
-      overflowX="scroll" 
-    >
-      {
-        exportPreview && (
-          <Box 
-            background={watchWithDarkTheme ? 'black' : 'transparent'} 
-            role="img"
-            overflowY="scroll"
-            borderStyle="solid"
-            borderWidth="1px"
-            border={color}
-            borderRadius="15px"
-            dangerouslySetInnerHTML={{ __html: exportPreview.outerHTML }} 
-          />
-        )
-      }   
-    </Flex>
   )
 }
 

@@ -9,20 +9,38 @@ export interface IDrawListItem {
     description?: string
 }
 
+interface IChildrenProps {
+  draw: IDrawListItem
+  isSelected: boolean
+  isHovered: boolean
+}
+
 export interface IDrawListProps {
     items: IDrawListItem[]
     selectedValue?: string
     onSelectDraw: (item: IDrawListItem) => void
-    children: (item: IDrawListItem, isSelected: boolean) => React.ReactNode
+    onHoverDraw?: (item?: IDrawListItem) => void
+    children: (props: IChildrenProps) => React.ReactNode
 }
 
 const DrawList = (props: IDrawListProps) => {
-  const { items, selectedValue, onSelectDraw, children } = props
+  const { items, selectedValue, onSelectDraw, children, onHoverDraw } = props
   const [selectedItem, setSelectedItem] = React.useState<IDrawListItem>()
+  const [hoveredItem, setHoveredItem] = React.useState<IDrawListItem>()
 
   const handleSelectDrawFromList = (item: IDrawListItem) => {
     setSelectedItem(item)
     onSelectDraw(item)
+  }
+
+  const handleHoverDrawFromList = (item: IDrawListItem) => {
+    setHoveredItem(item)
+    onHoverDraw && onHoverDraw(item)
+  }
+
+  const handleUnHover = () => {
+    setHoveredItem(undefined)
+    onHoverDraw && onHoverDraw()
   }
 
   React.useEffect(() => {
@@ -37,11 +55,18 @@ const DrawList = (props: IDrawListProps) => {
   return (
     <DrawListContext.Provider value={{
       selectedItem,
+      hoveredItem,
       onSelectItem: handleSelectDrawFromList,
+      onHoverItem: handleHoverDrawFromList,
+      unHover: handleUnHover,
     }}>
       {items.map((draw) => (
         <DrawListItem key={draw.id} item={draw} >
-          {children(draw, selectedItem?.id === draw.id)}
+          {children({ 
+            draw, 
+            isSelected: selectedItem?.id === draw.id,
+            isHovered: hoveredItem?.id === draw.id
+          })}
         </DrawListItem>
       ))}
     </DrawListContext.Provider>
