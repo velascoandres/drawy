@@ -34,7 +34,7 @@ impl DrawRepository for DrawRepositoryImpl {
         let new_draw = DrawDiesel {
             id: uuid.to_string(),
             name: draw.name.clone(),
-            description: None,
+            description: draw.description.clone(),
             raw_elements: draw.raw_elements.clone(),
             created_at: now,
             updated_at: now,

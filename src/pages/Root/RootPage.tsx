@@ -148,6 +148,19 @@ const RootPage = () => {
         >
           Import
         </Button>
+        <Box bg="white" w="full">
+          {
+            response && (
+              <Paginator
+                perPage={10}
+                total={response.count}
+                page={query.page} 
+                totalPages={response.totalPages}
+                onPageChange={handlePageChange}
+              />
+            ) 
+          }
+        </Box>
       </Flex>
       <Box overflowY="auto" height={listHeight}>
         <DrawList 
@@ -181,17 +194,6 @@ const RootPage = () => {
             </Flex>
           )}
         </DrawList>
-      </Box>
-      <Box position="absolute" bottom={0} bg="white" w="full">
-        {
-          response && (
-            <Paginator 
-              page={query.page} 
-              totalPages={response.totalPages}
-              onPageChange={handlePageChange}
-            />
-          ) 
-        }
       </Box>
     </Box>
   )

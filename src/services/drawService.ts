@@ -50,9 +50,10 @@ export interface IDrawInfoQuery {
   page: number
 }
 
-const createDraw = async (newDraw: Omit<IDraw, 'id'>): Promise<IBackendResponse<string>> => {
+const createDraw = async (newDraw: Omit<IDraw, 'id'>): Promise<IBackendResponse<IRawDraw>> => {
   const result = await invoke('create_draw_command', {
     name: newDraw.name,
+    description: newDraw.description,
     elementsMeta: JSON.stringify(newDraw.scene || {})
   })
 
