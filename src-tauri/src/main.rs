@@ -2,7 +2,7 @@ use drawy::application::{handlers::draws, models::app_state::AppState};
 use drawy::domain::services::draw::DrawService;
 use drawy::infra::databases::sqlite::get_sqlite_pool;
 use drawy::infra::repositories::draws::DrawRepositoryImpl;
-use drawy::menu;
+use drawy::application::window::menu;
 
 #[cfg_attr(
     all(not(debug_assertions), target_os = "windows"),
