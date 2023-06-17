@@ -9,7 +9,9 @@ describe('<Paginator /> tests', () => {
   describe('when renders', () => {
     it('should show initial ui', () => {
       const { getByText } = customRender(
-        <Paginator 
+        <Paginator
+          perPage={100}
+          total={10} 
           page={1}
           onPageChange={vi.fn()}
           totalPages={10}
@@ -22,6 +24,8 @@ describe('<Paginator /> tests', () => {
     it('should show page actions', () => {
       const { getByLabelText } = customRender(
         <Paginator 
+          perPage={100}
+          total={10} 
           page={1}
           onPageChange={vi.fn()}
           totalPages={10}
@@ -34,7 +38,9 @@ describe('<Paginator /> tests', () => {
 
     it('should show prev-page action disabled if page is 1', () => {
       const { getByLabelText } = customRender(
-        <Paginator 
+        <Paginator
+          perPage={100}
+          total={10}  
           page={1}
           onPageChange={vi.fn()}
           totalPages={10}
@@ -46,7 +52,9 @@ describe('<Paginator /> tests', () => {
 
     it('should show prev-page action disabled if page is the last', () => {
       const { getByLabelText } = customRender(
-        <Paginator 
+        <Paginator
+          perPage={100}
+          total={10}  
           page={10}
           onPageChange={vi.fn()}
           totalPages={10}
@@ -58,7 +66,9 @@ describe('<Paginator /> tests', () => {
 
     it('should show 0 / 0 if total pages is zero', () => {
       const { getByText } = customRender(
-        <Paginator 
+        <Paginator
+          perPage={100}
+          total={10}  
           page={1}
           onPageChange={vi.fn()}
           totalPages={0}
@@ -72,7 +82,9 @@ describe('<Paginator /> tests', () => {
   describe('When paginate', () => { 
     it('should update pagination info', async () => {
       const { getByText, getByLabelText } = customRender(
-        <Paginator 
+        <Paginator
+          perPage={100}
+          total={10}  
           page={1}
           onPageChange={vi.fn()}
           totalPages={10}
@@ -91,6 +103,8 @@ describe('<Paginator /> tests', () => {
 
       const { getByLabelText } = customRender(
         <Paginator 
+          perPage={100}
+          total={10} 
           page={1}
           onPageChange={onPageChangeMock}
           totalPages={10}

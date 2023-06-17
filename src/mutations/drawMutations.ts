@@ -15,7 +15,7 @@ export const useCreateDrawMutation = () => {
         throw new Error('Error on create a draw')
       }
 
-      return response.data as string
+      return response.data
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['draws_info'] })

@@ -9,20 +9,23 @@ import { Flex, IconButton, Text } from '@chakra-ui/react'
 const DEFAULT_PAGE = 1
 const PAGINATION_FACTOR = 1
 const EMPTY_PAGE_INDICATOR = 0
+const PAGE_INDICATOR = 1
 
 
 interface IProps {
-    page?: number
+    perPage: number
+    total: number
+    page: number
     totalPages: number
     onPageChange: (page: number) => void
 }
 
 const Paginator = (props: IProps) => {
-  const { page = DEFAULT_PAGE, onPageChange, totalPages } = props
+  const { page = DEFAULT_PAGE, onPageChange, totalPages, perPage, total } = props
 
   const [currentPage, setCurrentPage] = React.useState(page)
 
-  const buildPagintionHandler = (paginationFactor: number) => () => {
+  const buildPaginationHandler = (paginationFactor: number) => () => {
     const newPage = currentPage + paginationFactor
     
     setCurrentPage(newPage)
@@ -32,22 +35,24 @@ const Paginator = (props: IProps) => {
 
   return (
     <Flex direction="row" justifyContent="center" gap={2} alignItems="center">
+      <Text fontSize="sm" fontWeight="semibold">
+        {(page - PAGE_INDICATOR) * perPage + PAGE_INDICATOR} - {page >= totalPages ? total : perPage} of {total}  </Text>
       <IconButton
         isDisabled={currentPage === DEFAULT_PAGE}
         variant="outline"
-        onClick={buildPagintionHandler(-PAGINATION_FACTOR)}
+        onClick={buildPaginationHandler(-PAGINATION_FACTOR)}
         aria-label="prev-page"
         icon={<FiArrowLeft />}
       />
 
-      <Text as="p" size="md">
+      <Text as="p" fontSize="sm">
         {`${totalPages ? currentPage : EMPTY_PAGE_INDICATOR } / ${totalPages}`}
       </Text>
       
       <IconButton
         isDisabled={currentPage === totalPages}
         variant="outline"
-        onClick={buildPagintionHandler(PAGINATION_FACTOR)}
+        onClick={buildPaginationHandler(PAGINATION_FACTOR)}
         aria-label="next-page"
         icon={<FiArrowRight />}
       />

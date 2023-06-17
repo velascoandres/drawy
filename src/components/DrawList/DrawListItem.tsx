@@ -21,9 +21,9 @@ const DrawListItem = ({ item, children, ...rest }: IDrawListItemProps) => {
       bg={isSelected ? 'black' : 'white'}
       align="center"
       px="4"
-      py="6"
+      py="5"
       mx="4"
-      my="1"
+      my="0"
       borderRadius="lg"
       role="group"
       cursor="pointer"

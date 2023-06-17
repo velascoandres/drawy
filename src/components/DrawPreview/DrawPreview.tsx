@@ -101,10 +101,9 @@ const DrawPreview = (props: IProps) => {
 
 
   return (
-    <Flex direction="column" gap={1}>
+    <Flex direction="column" gap={1} alignItems="center">
       <Flex 
         direction="row" 
-        justify="center"
         position="relative"
         maxHeight={MAX_HEIGHT}
         maxWidth={MAX_WIDTH}

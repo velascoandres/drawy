@@ -34,12 +34,12 @@ import { IDrawInfoQuery } from '@/services/drawService'
 import useModalStore from '@/store/modal/modalStore'
 
 const SMALL_HEIGHT = 300
-const MEDIUM_HEIGHT = 645
+const MEDIUM_HEIGHT = 670
 const LARGE_HEIGHT = 950
 
 const QUARTER_SCALE_FACTOR = 0.25
 const MEDIUM_SCALE_FACTOR = 0.50
-const STANDARD_SCALE_FACTOR = 0.70
+const STANDARD_SCALE_FACTOR = 0.65
 const LARGE_SCALE_FACTOR = 0.75
 
 const RootPage = () => {
@@ -148,6 +148,19 @@ const RootPage = () => {
         >
           Import
         </Button>
+        <Box bg="white" w="full">
+          {
+            response && (
+              <Paginator
+                perPage={10}
+                total={response.count}
+                page={query.page} 
+                totalPages={response.totalPages}
+                onPageChange={handlePageChange}
+              />
+            ) 
+          }
+        </Box>
       </Flex>
       <Box overflowY="auto" height={listHeight}>
         <DrawList 
@@ -181,17 +194,6 @@ const RootPage = () => {
             </Flex>
           )}
         </DrawList>
-      </Box>
-      <Box position="absolute" bottom={0} bg="white" w="full">
-        {
-          response && (
-            <Paginator 
-              page={query.page} 
-              totalPages={response.totalPages}
-              onPageChange={handlePageChange}
-            />
-          ) 
-        }
       </Box>
     </Box>
   )
