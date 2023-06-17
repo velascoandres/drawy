@@ -25,7 +25,7 @@ const Paginator = (props: IProps) => {
 
   const [currentPage, setCurrentPage] = React.useState(page)
 
-  const buildPagintionHandler = (paginationFactor: number) => () => {
+  const buildPaginationHandler = (paginationFactor: number) => () => {
     const newPage = currentPage + paginationFactor
     
     setCurrentPage(newPage)
@@ -35,12 +35,12 @@ const Paginator = (props: IProps) => {
 
   return (
     <Flex direction="row" justifyContent="center" gap={2} alignItems="center">
-      <Text fontSize="sm">
+      <Text fontSize="sm" fontWeight="semibold">
         {(page - PAGE_INDICATOR) * perPage + PAGE_INDICATOR} - {page >= totalPages ? total : perPage} of {total}  </Text>
       <IconButton
         isDisabled={currentPage === DEFAULT_PAGE}
         variant="outline"
-        onClick={buildPagintionHandler(-PAGINATION_FACTOR)}
+        onClick={buildPaginationHandler(-PAGINATION_FACTOR)}
         aria-label="prev-page"
         icon={<FiArrowLeft />}
       />
@@ -52,7 +52,7 @@ const Paginator = (props: IProps) => {
       <IconButton
         isDisabled={currentPage === totalPages}
         variant="outline"
-        onClick={buildPagintionHandler(PAGINATION_FACTOR)}
+        onClick={buildPaginationHandler(PAGINATION_FACTOR)}
         aria-label="next-page"
         icon={<FiArrowRight />}
       />
