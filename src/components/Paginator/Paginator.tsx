@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 import React from 'react'
 import {
   FiArrowLeft,
@@ -33,10 +34,23 @@ const Paginator = (props: IProps) => {
     onPageChange(newPage)
   }
 
+  const pageInfo = React.useMemo(() => {
+    let currentPage = 0
+    let totalUntilPage = 0
+
+    if (total) {
+      currentPage = (page - PAGE_INDICATOR) * perPage + PAGE_INDICATOR
+      totalUntilPage = page >= totalPages ? total : perPage * page
+    }
+
+    return `${currentPage} - ${totalUntilPage} of ${total}`
+  }, [page, perPage, total, totalPages])
+
   return (
     <Flex direction="row" justifyContent="center" gap={2} alignItems="center">
       <Text fontSize="sm" fontWeight="semibold">
-        {(page - PAGE_INDICATOR) * perPage + PAGE_INDICATOR} - {page >= totalPages ? total : perPage} of {total}  </Text>
+        {pageInfo} 
+      </Text>
       <IconButton
         isDisabled={currentPage === DEFAULT_PAGE}
         variant="outline"
@@ -46,7 +60,7 @@ const Paginator = (props: IProps) => {
       />
 
       <Text as="p" fontSize="sm">
-        {`${totalPages ? currentPage : EMPTY_PAGE_INDICATOR } / ${totalPages}`}
+        {`${Boolean(totalPages) ? currentPage : EMPTY_PAGE_INDICATOR } / ${totalPages}`}
       </Text>
       
       <IconButton
