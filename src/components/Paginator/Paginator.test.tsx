@@ -21,6 +21,48 @@ describe('<Paginator /> tests', () => {
       expect(getByText('1 / 10')).toBeInTheDocument()
     })
 
+    it('should show page info', () => {
+      const { getByText } = customRender(
+        <Paginator
+          perPage={10}
+          total={100} 
+          page={3}
+          onPageChange={vi.fn()}
+          totalPages={10}
+        />
+      )
+
+      expect(getByText('21 - 30 of 100')).toBeInTheDocument()
+    })
+
+    it('should show page info for last page', () => {
+      const { getByText } = customRender(
+        <Paginator
+          perPage={10}
+          total={102} 
+          page={11}
+          onPageChange={vi.fn()}
+          totalPages={10}
+        />
+      )
+
+      expect(getByText('101 - 102 of 102')).toBeInTheDocument()
+    })
+
+    it('should show page info for empty state', () => {
+      const { getByText } = customRender(
+        <Paginator
+          perPage={10}
+          total={0} 
+          page={11}
+          onPageChange={vi.fn()}
+          totalPages={10}
+        />
+      )
+
+      expect(getByText('0 - 0 of 0')).toBeInTheDocument()
+    })
+
     it('should show page actions', () => {
       const { getByLabelText } = customRender(
         <Paginator 
